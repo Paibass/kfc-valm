@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KFC Liniers – VALM Ticket Scanner
 
-## Getting Started
+Aplicación web para **digitalizar tickets de VALM (Venta a la Mesa)** mediante OCR y almacenar la información estructurada en una planilla de Google Sheets.
 
-First, run the development server:
+La herramienta reemplaza el registro manual del libro de VALM, optimizando tiempos operativos y reduciendo errores de carga.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Descripción general
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+La aplicación funciona íntegramente del lado del cliente y permite:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Capturar imágenes de tickets desde dispositivos móviles
+- Extraer datos relevantes mediante OCR
+- Validar y corregir la información detectada
+- Persistir los registros en un soporte centralizado
 
-## Learn More
+No requiere backend propio ni servicios pagos.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Alcance funcional
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+El sistema procesa tickets impresos y obtiene los siguientes datos:
 
-## Deploy on Vercel
+- Fecha del ticket  
+- Identificador de transacción (últimos 4 dígitos del CHK)  
+- Cajero/a (seleccionado desde un conjunto controlado de cajeros actuales)  
+- Detalle de la venta (normalizado)  
+- Total de la operación  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Todos los campos son editables antes de confirmar el guardado.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Estrategia de carga de datos
+
+- El texto detectado por OCR **no se considera confiable automáticamente**
+- La aplicación:
+  - autocompleta campos cuando es posible
+  - permite corrección manual en todos los casos
+- El cajero se selecciona desde un `<select>` para evitar inconsistencias
+
+El envío se realiza mediante una solicitud `POST` a Google Forms (`no-cors`).
+
+---
+
+## Estrategia de OCR
+
+- OCR ejecutado localmente con **Tesseract.js**
+- Preprocesamiento de imágenes:
+  - redimensionado
+  - escala de grises
+  - mejora de contraste
+- Detección basada en **patrones**, no en palabras clave fijas:
+  - formatos de fecha
+  - valores monetarios
+  - identificadores alfanuméricos
+
+Este enfoque mejora la tolerancia a errores de OCR y variaciones en el formato del ticket.
+
+---
+
+## Normalización de cajeros
+
+- Existe un conjunto predefinido de cajeros activos
+- El OCR intenta detectar coincidencias parciales sobre:
+  - nombre
+  - apellido
+  - combinaciones alfanuméricas
+- La selección final queda siempre bajo control del usuario
+
+Esto garantiza consistencia en los datos almacenados.
+
+---
+
+## Interfaz de usuario
+
+- Diseño **mobile-first**
+- Flujo de uso reducido:
+  1. Captura de imagen
+  2. Escaneo
+  3. Validación
+  4. Guardado
+- Consola interna para visualizar el texto OCR
+- Pensado para uso operativo frecuente
+
+---
+
+## Deploy
+
+- Framework: **Next.js (App Router)**
+- Hosting: **Vercel**
+- Ejecución completamente del lado del cliente
+- Sin capa de backend propia
+
+---
+
+## Limitaciones
+
+- La precisión del OCR depende de:
+  1. calidad de la imagen
+  2. iluminacion
+  3. estado fisico del ticket
+
+---
+
+## Uso previsto
+
+- Herramienta de uso interno para el registro de tickets VALM.
+- 
+  
