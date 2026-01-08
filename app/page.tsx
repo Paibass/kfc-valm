@@ -89,14 +89,46 @@ export default function Page() {
 
   return (
       <div className="container">
-        <div className="card">
-          <div className="title">
-            <div className="logo" />
-            <div>
-              <strong>KFC Ticket Scan</strong>
-              <div className="small">Foto → Escanear → Guardar</div>
+          <div className="topbar">
+            <div className="brand">
+              <div className="logoBox">
+                {/* espacio listo para imagen local */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icon.png" alt="Logo" className="logoImg" />
+              </div>
+
+              <strong className="brandTitle">KFC LINIERS VALM</strong>
             </div>
-          </div>
+
+            <a
+                className="sheetBtn"
+                href="https://docs.google.com/spreadsheets/d/1JoJCl0i5Q3WHTc5jzhQM9Om4BPS9Wa_dYTdqU1RhOUw/edit?usp=sharing"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Abrir Google Sheets"
+                title="Abrir Google Sheets"
+            >
+              {/* ícono tipo spreadsheets (simple SVG) */}
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path
+                    d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1v5h5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                />
+                <path
+                    d="M7 12h10M7 16h10M10 10v10M14 10v10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                />
+              </svg>
+              <span>Abrir planilla</span>
+            </a>
+            </div>
+
 
           <div className="section">
             <div>
@@ -290,6 +322,5 @@ export default function Page() {
 
           </div>
         </div>
-      </div>
   );
 }
