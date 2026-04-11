@@ -12,7 +12,13 @@ export default function Page() {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
-  const [ticket, setTicket] = useState<TicketData | null>(null);
+  const [ticket, setTicket] = useState<TicketData>({
+    fecha: "",
+    chk4: "",
+    cajero: "",
+    detalle: "",
+    total: "",
+  });
   const [toast, setToast] = useState<string>("");
   const [ocrRaw, setOcrRaw] = useState<string>("");
   const [showConsole, setShowConsole] = useState<boolean>(false);
@@ -22,7 +28,6 @@ export default function Page() {
 
 
   const canSave = useMemo(() => {
-    if (!ticket) return false;
     return !!ticket.fecha && !!ticket.chk4 && !!ticket.cajero && !!ticket.detalle && !!ticket.total;
   }, [ticket]);
 
@@ -30,19 +35,22 @@ export default function Page() {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setFile(null);
     setPreviewUrl("");
-    setTicket(null);
+    setTicket({
+      fecha: "",
+      chk4: "",
+      cajero: "",
+      detalle: "",
+      total: "",
+    });
     setToast("");
     setProgress(null);
     setOcrRaw("");
     setShowConsole(false);
-
   }
 
   function onPick(f: File | null) {
     setToast("");
-    setTicket(null);
     setProgress(null);
-
     setFile(f);
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(f ? URL.createObjectURL(f) : "");
@@ -73,7 +81,7 @@ export default function Page() {
   }
 
   async function onSave() {
-    if (!ticket) return;
+    if (!canSave) return;
     setBusy(true);
     setToast("");
 
@@ -168,18 +176,17 @@ export default function Page() {
                 <label>Fecha</label>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
-                      value={ticket?.fecha ?? ""}
-                      onChange={(e) => ticket && setTicket({ ...ticket, fecha: e.target.value })}
+                      value={ticket.fecha}
+                      onChange={(e) => setTicket({ ...ticket, fecha: e.target.value })}
                       placeholder="dd/mm/aaaa"
-                      disabled={busy || !ticket}
+                      disabled={busy}
                   />
                   <button
                       type="button"
                       className="secondary"
                       style={{ flex: "0 0 auto", minWidth: 90 }}
-                      disabled={busy || !ticket}
+                      disabled={busy}
                       onClick={() => {
-                        if (!ticket) return;
                         const d = new Date();
                         const dd = String(d.getDate()).padStart(2, "0");
                         const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -197,10 +204,10 @@ export default function Page() {
                 <input
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    value={ticket?.chk4 ?? ""}
-                    onChange={(e) => ticket && setTicket({ ...ticket, chk4: e.target.value.replace(/\D/g, "").slice(0, 4) })}
+                    value={ticket.chk4}
+                    onChange={(e) => setTicket({ ...ticket, chk4: e.target.value.replace(/\D/g, "").slice(0, 4) })}
                     placeholder="0000"
-                    disabled={busy || !ticket}
+                    disabled={busy}
                 />
 
               </div>
@@ -210,9 +217,9 @@ export default function Page() {
               <div className="col">
                 <label>Cajero</label>
                 <select
-                    value={ticket?.cajero ?? ""}
-                    onChange={(e) => ticket && setTicket({ ...ticket, cajero: e.target.value })}
-                    disabled={busy || !ticket}
+                    value={ticket.cajero}
+                    onChange={(e) => setTicket({ ...ticket, cajero: e.target.value })}
+                    disabled={busy}
                     style={{
                       width: "100%",
                       padding: 12,
@@ -235,14 +242,13 @@ export default function Page() {
                 <label>Total</label>
                 <input
                     inputMode="decimal"
-                    value={ticket?.total ?? ""}
+                    value={ticket.total}
                     onChange={(e) => {
-                      if (!ticket) return;
                       const v = e.target.value.replace(/[^0-9.,]/g, "");
                       setTicket({ ...ticket, total: v });
                     }}
                     placeholder="0,00"
-                    disabled={busy || !ticket}
+                    disabled={busy}
                 />
 
               </div>
@@ -251,15 +257,15 @@ export default function Page() {
             <div>
               <label>Detalle</label>
               <input
-                  value={ticket?.detalle ?? ""}
-                  onChange={(e) => ticket && setTicket({ ...ticket, detalle: e.target.value })}
+                  value={ticket.detalle}
+                  onChange={(e) => setTicket({ ...ticket, detalle: e.target.value })}
                   placeholder="Ej: Lagrima med + tos"
-                  disabled={busy || !ticket}
+                  disabled={busy}
               />
             </div>
 
             <div className="actions">
-              <button className="primary" onClick={onSave} disabled={!ticket || !canSave || busy}>
+              <button className="primary" onClick={onSave} disabled={!canSave || busy}>
                 Guardar
               </button>
               <button className="secondary" onClick={resetAll} disabled={busy}>
