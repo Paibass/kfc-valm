@@ -1,11 +1,24 @@
 "use client";
 
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import { preprocessToBlob } from "@/lib/imagePreprocess";
-import { runOcrOnBlob } from "@/lib/ocr";
-import { parseTicketFromOcr, TicketData } from "@/lib/parseTicket";
 import { submitToGoogleForm } from "@/lib/submitToGoogleForm";
 import { CAJEROS } from "@/lib/cajeros";
+
+// Types
+interface Product {
+  id: string;
+  categoria: string;
+  nombre: string;
+  precio: number;
+  tipo: string;
+}
+
+interface CartItem {
+  id: string;
+  nombre: string;
+  precio: number;
+  cantidad: number;
+}
 
 // localStorage helpers
 const STORAGE_KEYS = {
@@ -39,187 +52,190 @@ function getTodayFormatted(): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    minimumFractionDigits: 0,
+  }).format(value);
+}
+
 export default function Page() {
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>("");
-  const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState<number | null>(null);
-  
+  // Products from JSON
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+
   // Session state (persisted)
   const [sessionCajero, setSessionCajero] = useState<string>("");
   const [sessionFecha, setSessionFecha] = useState<string>("");
   const [sessionLoaded, setSessionLoaded] = useState(false);
-  
+
   // Ticket state (reset per ticket)
-  const [ticket, setTicket] = useState<TicketData>({
-    fecha: "",
-    chk4: "",
-    cajero: "",
-    detalle: "",
-    total: "",
-    raw: "",
-  });
+  const [chk4, setChk4] = useState<string>("");
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [categoria, setCategoria] = useState<string>("desayuno_merienda");
+
+  // UI state
+  const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string>("");
-  const [ocrRaw, setOcrRaw] = useState<string>("");
-  const [showConsole, setShowConsole] = useState<boolean>(false);
+
+  // Load products from JSON
+  useEffect(() => {
+    fetch("/products.json")
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data);
+        setProductsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error loading products:", err);
+        setProductsLoading(false);
+      });
+  }, []);
 
   // Load session from localStorage on mount
   useEffect(() => {
     const storedCajero = getStoredValue(STORAGE_KEYS.cajero, "");
     const storedFecha = getStoredValue(STORAGE_KEYS.fecha, "");
-    
-    // Use stored fecha or default to today
     const fecha = storedFecha || getTodayFormatted();
-    
+
     setSessionCajero(storedCajero);
     setSessionFecha(fecha);
-    setTicket(prev => ({
-      ...prev,
-      cajero: storedCajero,
-      fecha: fecha,
-    }));
     setSessionLoaded(true);
   }, []);
 
   // Auto-update date when day changes
   useEffect(() => {
     if (!sessionLoaded) return;
-    
+
     const checkDateChange = () => {
       const today = getTodayFormatted();
       const storedFecha = getStoredValue(STORAGE_KEYS.fecha, "");
-      
-      // If stored date is different from today, update to today
+
       if (storedFecha && storedFecha !== today) {
         setSessionFecha(today);
         setStoredValue(STORAGE_KEYS.fecha, today);
-        setTicket(prev => ({ ...prev, fecha: today }));
       }
     };
-    
-    // Check every minute
+
     const interval = setInterval(checkDateChange, 60000);
     return () => clearInterval(interval);
   }, [sessionLoaded]);
 
-  // Update session handlers
+  // Session handlers
   const updateSessionCajero = useCallback((value: string) => {
     setSessionCajero(value);
     setStoredValue(STORAGE_KEYS.cajero, value);
-    setTicket(prev => ({ ...prev, cajero: value }));
   }, []);
 
   const updateSessionFecha = useCallback((value: string) => {
     setSessionFecha(value);
     setStoredValue(STORAGE_KEYS.fecha, value);
-    setTicket(prev => ({ ...prev, fecha: value }));
   }, []);
 
+  // Calculated total
+  const total = useMemo(() => {
+    return items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+  }, [items]);
 
+  // Generate detalle string from items
+  const detalle = useMemo(() => {
+    return items
+      .map((item) => (item.cantidad > 1 ? `${item.cantidad}x ${item.nombre}` : item.nombre))
+      .join(" + ");
+  }, [items]);
+
+  // Validation
   const canSave = useMemo(() => {
-    return !!ticket.fecha && !!ticket.chk4 && !!ticket.cajero && !!ticket.detalle && !!ticket.total;
-  }, [ticket]);
+    return !!sessionFecha && !!sessionCajero && !!chk4 && items.length > 0;
+  }, [sessionFecha, sessionCajero, chk4, items]);
 
-  // Reset only ticket-specific fields, keep session (cajero/fecha)
+  // Add product to cart
+  const addProduct = useCallback((product: Product) => {
+    setItems((prev) => {
+      const existing = prev.find((item) => item.id === product.id);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === product.id ? { ...item, cantidad: item.cantidad + 1 } : item
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: product.id,
+          nombre: product.nombre,
+          precio: product.precio,
+          cantidad: 1,
+        },
+      ];
+    });
+  }, []);
+
+  // Remove item from cart
+  const removeItem = useCallback((id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  }, []);
+
+  // Decrease quantity
+  const decreaseItem = useCallback((id: string) => {
+    setItems((prev) =>
+      prev
+        .map((item) =>
+          item.id === id ? { ...item, cantidad: item.cantidad - 1 } : item
+        )
+        .filter((item) => item.cantidad > 0)
+    );
+  }, []);
+
+  // Reset for new ticket (keep session)
   function resetForNewTicket() {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setFile(null);
-    setPreviewUrl("");
-    setTicket({
-      fecha: sessionFecha,
-      chk4: "",
-      cajero: sessionCajero,
-      detalle: "",
-      total: "",
-      raw: "",
-    });
+    setChk4("");
+    setItems([]);
     setToast("");
-    setProgress(null);
-    setOcrRaw("");
-    setShowConsole(false);
-  }
-  
-  // Full reset including session
-  function resetAll() {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setFile(null);
-    setPreviewUrl("");
-    setTicket({
-      fecha: sessionFecha,
-      chk4: "",
-      cajero: sessionCajero,
-      detalle: "",
-      total: "",
-      raw: "",
-    });
-    setToast("");
-    setProgress(null);
-    setOcrRaw("");
-    setShowConsole(false);
   }
 
-  function onPick(f: File | null) {
-    setToast("");
-    setProgress(null);
-    setFile(f);
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(f ? URL.createObjectURL(f) : "");
-  }
-
-  async function onScan() {
-    if (!file) return;
-    setBusy(true);
-    setToast("");
-    setProgress(0);
-
-    try {
-      const blob = await preprocessToBlob(file);
-      const text = await runOcrOnBlob(blob, (p) => {
-        if (typeof p.progress === "number") setProgress(p.progress);
-      });
-      setOcrRaw(text);
-
-      const parsed = parseTicketFromOcr(text);
-      // Preserve session fields (fecha, cajero), only use OCR for ticket-specific data
-      setTicket({
-        ...parsed,
-        fecha: sessionFecha,
-        cajero: sessionCajero,
-      });
-      setToast("Listo. Revisá y guardá.");
-    } catch (e: any) {
-      setToast(`Error escaneando: ${e?.message ?? String(e)}`);
-    } finally {
-      setBusy(false);
-      setProgress(null);
-    }
-  }
-
+  // Save ticket
   async function onSave() {
     if (!canSave) return;
     setBusy(true);
     setToast("");
 
     try {
-      await submitToGoogleForm(ticket);
-      setToast("✅ Guardado.");
-    } catch (e: any) {
-      setToast(`Error guardando: ${e?.message ?? String(e)}`);
+      await submitToGoogleForm({
+        fecha: sessionFecha,
+        chk4,
+        cajero: sessionCajero,
+        detalle,
+        total: total.toString(),
+        raw: "",
+      });
+      setToast("Guardado");
+      // Auto reset for next ticket
+      setTimeout(() => {
+        resetForNewTicket();
+      }, 800);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      setToast(`Error: ${message}`);
     } finally {
       setBusy(false);
     }
   }
 
+  // Filter products by category
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => p.categoria === categoria);
+  }, [products, categoria]);
+
   return (
     <div className="container">
-      <div className="topbar">
+      {/* Header */}
+      <header className="topbar">
         <div className="brand">
           <div className="logoBox">
-            {/* espacio listo para imagen local */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon.png" alt="Logo" className="logoImg" />
           </div>
-
           <strong className="brandTitle">KFC LINIERS VALM</strong>
         </div>
 
@@ -231,7 +247,6 @@ export default function Page() {
           aria-label="Abrir Google Sheets"
           title="Abrir Google Sheets"
         >
-          {/* ícono tipo spreadsheets (simple SVG) */}
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
             <path
               d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1v5h5"
@@ -248,85 +263,32 @@ export default function Page() {
               strokeLinecap="round"
             />
           </svg>
-          <span>Abrir planilla</span>
         </a>
-      </div>
+      </header>
 
-
-      <div className="section">
-        <div>
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={(e) => onPick(e.target.files?.[0] ?? null)}
-            disabled={busy}
-          />
-        </div>
-
-        {previewUrl && (
-          <div className="preview">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={previewUrl} alt="ticket preview" />
-          </div>
-        )}
-
-        <div className="actions">
-          <button className="primary" onClick={onScan} disabled={!file || busy}>
-            {busy ? "Procesando..." : "Escanear"}
-          </button>
-          <button className="secondary" onClick={resetAll} disabled={busy}>
-            Limpiar
-          </button>
-        </div>
-
-        {progress != null && (
-          <div className="toast">OCR: {Math.round(progress * 100)}%</div>
-        )}
-
-        <div className="divider" />
-
-        {/* Session fields - persistent */}
-        <div className="sessionCard">
-          <div className="sessionHeader">
-            <span className="sessionBadge">Sesion activa</span>
-          </div>
-          <div className="row">
-            <div className="col">
+      <main className="section">
+        {/* Session Block */}
+        <div className="sessionBlock">
+          <div className="sessionRow">
+            <div className="sessionField">
               <label>Fecha</label>
               <input
                 type="date"
-                value={ticket.fecha}
+                value={sessionFecha}
                 onChange={(e) => updateSessionFecha(e.target.value)}
                 disabled={busy}
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 14,
-                  border: "1px solid rgba(0,0,0,.10)",
-                  background: "#fff",
-                  fontSize: 14,
-                }}
               />
             </div>
 
-            <div className="col">
+            <div className="sessionField">
               <label>Cajero</label>
               <select
-                value={ticket.cajero}
+                value={sessionCajero}
                 onChange={(e) => updateSessionCajero(e.target.value)}
                 disabled={busy}
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 14,
-                  border: "1px solid rgba(0,0,0,.10)",
-                  background: "#fff",
-                  fontSize: 14,
-                }}
               >
                 <option value="">Seleccionar...</option>
-                {CAJEROS.map(c => (
+                {CAJEROS.map((c) => (
                   <option key={c.label} value={c.label}>
                     {c.label}
                   </option>
@@ -334,112 +296,130 @@ export default function Page() {
               </select>
             </div>
           </div>
-        </div>
 
-        <div className="divider" />
-
-        {/* Ticket fields - reset per ticket */}
-        <div className="row">
-          <div className="col">
+          <div className="sessionField">
             <label>CHK (ultimos 4)</label>
             <input
               inputMode="numeric"
               pattern="[0-9]*"
-              value={ticket.chk4}
-              onChange={(e) => setTicket({ ...ticket, chk4: e.target.value.replace(/\D/g, "").slice(0, 4) })}
+              value={chk4}
+              onChange={(e) => setChk4(e.target.value.replace(/\D/g, "").slice(0, 4))}
               placeholder="0000"
               disabled={busy}
-            />
-          </div>
-
-          <div className="col">
-            <label>Total</label>
-            <input
-              inputMode="decimal"
-              value={ticket.total}
-              onChange={(e) => {
-                const v = e.target.value.replace(/[^0-9.,]/g, "");
-                setTicket({ ...ticket, total: v });
-              }}
-              placeholder="0,00"
-              disabled={busy}
+              style={{ fontSize: 18, fontWeight: 600, letterSpacing: 4 }}
             />
           </div>
         </div>
 
-        <div>
-          <label>Detalle</label>
-          <input
-            value={ticket.detalle}
-            onChange={(e) => setTicket({ ...ticket, detalle: e.target.value })}
-            placeholder="Ej: Lagrima med + tos"
-            disabled={busy}
-          />
-        </div>
-
-        <div className="actions">
-          <button className="primary" onClick={onSave} disabled={!canSave || busy}>
-            Guardar
+        {/* Category Selector */}
+        <div className="categorySelector">
+          <button
+            type="button"
+            className={`categoryBtn ${categoria === "desayuno_merienda" ? "active" : ""}`}
+            onClick={() => setCategoria("desayuno_merienda")}
+          >
+            Desayuno / Merienda
           </button>
-          <button className="secondary" onClick={resetForNewTicket} disabled={busy}>
+          <button
+            type="button"
+            className={`categoryBtn ${categoria === "postres" ? "active" : ""}`}
+            onClick={() => setCategoria("postres")}
+          >
+            Postres
+          </button>
+        </div>
+
+        {/* Products Grid */}
+        <div className="productsGrid">
+          {productsLoading ? (
+            <div className="loadingMessage">Cargando productos...</div>
+          ) : (
+            filteredProducts.map((product) => (
+              <button
+                key={product.id}
+                type="button"
+                className="productBtn"
+                onClick={() => addProduct(product)}
+                disabled={busy}
+              >
+                <span className="productName">{product.nombre}</span>
+                <span className="productPrice">{formatCurrency(product.precio)}</span>
+              </button>
+            ))
+          )}
+        </div>
+
+        {/* Current Sale (Cart) */}
+        {items.length > 0 && (
+          <div className="cartCard">
+            <div className="cartHeader">Venta actual</div>
+            <div className="cartItems">
+              {items.map((item) => (
+                <div key={item.id} className="cartItem">
+                  <div className="cartItemInfo">
+                    <span className="cartItemQty">
+                      {item.cantidad > 1 ? `${item.cantidad}x ` : ""}
+                    </span>
+                    <span className="cartItemName">{item.nombre}</span>
+                  </div>
+                  <div className="cartItemActions">
+                    <span className="cartItemSubtotal">
+                      {formatCurrency(item.precio * item.cantidad)}
+                    </span>
+                    <button
+                      type="button"
+                      className="cartItemBtn decrease"
+                      onClick={() => decreaseItem(item.id)}
+                      aria-label="Reducir cantidad"
+                    >
+                      -
+                    </button>
+                    <button
+                      type="button"
+                      className="cartItemBtn remove"
+                      onClick={() => removeItem(item.id)}
+                      aria-label="Eliminar"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="cartDivider" />
+            <div className="cartTotal">
+              <span>TOTAL</span>
+              <span className="cartTotalValue">{formatCurrency(total)}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="actions">
+          <button
+            className="primary"
+            onClick={onSave}
+            disabled={!canSave || busy}
+          >
+            {busy ? "Guardando..." : "Guardar"}
+          </button>
+          <button
+            className="secondary"
+            onClick={resetForNewTicket}
+            disabled={busy}
+          >
             Nuevo ticket
           </button>
         </div>
 
-        {toast && <div className="toast">{toast}</div>}
-        {ocrRaw && (
-          <div className="divider" />
-        )}
-
-        {ocrRaw && (
-          <div className="card" style={{ padding: 12 }}>
-            <div className="row" style={{ alignItems: "center" }}>
-              <strong style={{ fontSize: 13 }}>🧠 Consola OCR</strong>
-              <div style={{ flex: 1 }} />
-              <button
-                className="secondary"
-                style={{ padding: "6px 10px", fontSize: 12 }}
-                onClick={() => setShowConsole(s => !s)}
-              >
-                {showConsole ? "Ocultar" : "Mostrar"}
-              </button>
-            </div>
-
-            {showConsole && (
-              <>
-                <div style={{ marginTop: 8 }}>
-                  <textarea
-                    value={ocrRaw}
-                    readOnly
-                    style={{
-                      width: "100%",
-                      minHeight: 180,
-                      resize: "vertical",
-                      fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                      fontSize: 12,
-                      padding: 10,
-                      borderRadius: 12,
-                      border: "1px solid rgba(0,0,0,.15)",
-                      background: "#0f0f0f",
-                      color: "#eaeaea",
-                    }}
-                  />
-                </div>
-
-                <div className="actions" style={{ marginTop: 8 }}>
-                  <button
-                    className="secondary"
-                    onClick={() => navigator.clipboard.writeText(ocrRaw)}
-                  >
-                    Copiar OCR
-                  </button>
-                </div>
-              </>
-            )}
+        {toast && (
+          <div className={`toast ${toast.startsWith("Error") ? "error" : "success"}`}>
+            {toast}
           </div>
         )}
-
-      </div>
+      </main>
     </div>
   );
 }
