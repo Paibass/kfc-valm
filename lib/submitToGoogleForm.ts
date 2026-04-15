@@ -2,6 +2,19 @@ import type { TicketData } from "./parseTicket";
 
 const FORM_ACTION = process.env.NEXT_PUBLIC_GOOGLE_FORM_ACTION!;
 
+/**
+ * Converts ISO date (yyyy-mm-dd) to Spanish format (dd/mm/yyyy)
+ * @param isoDate - Date in format "2026-04-13"
+ * @returns Date in format "13/04/2026"
+ */
+function formatDateToSpanish(isoDate: string): string {
+  if (!isoDate) return "";
+  const parts = isoDate.split("-");
+  if (parts.length !== 3) return isoDate; // Return as-is if not valid ISO
+  const [yyyy, mm, dd] = parts;
+  return `${dd}/${mm}/${yyyy}`;
+}
+
 const ENTRY = {
     fecha:   "entry.133549451",
     chk4:    "entry.978360335",
@@ -14,7 +27,7 @@ export async function submitToGoogleForm(t: TicketData) {
     if (!FORM_ACTION) throw new Error("Falta NEXT_PUBLIC_GOOGLE_FORM_ACTION en .env.local");
 
     const data = new URLSearchParams();
-    data.append(ENTRY.fecha, t.fecha || "");
+    data.append(ENTRY.fecha, formatDateToSpanish(t.fecha || ""));
     data.append(ENTRY.chk4, t.chk4 || "");
     data.append(ENTRY.cajero, t.cajero || "");
     data.append(ENTRY.detalle, t.detalle || "");
