@@ -2,211 +2,155 @@
   {
     "id": "cafe-chico-2med",
     "categoria": "desayuno_merienda",
-    "nombre": "Cafe chico + 2 med",
+    "nombre": "Café chico + 2 med",
     "precio": 2100,
     "tipo": "combo"
   },
   {
     "id": "cafe-mediano-2med",
     "categoria": "desayuno_merienda",
-    "nombre": "Cafe mediano + 2 med",
-    "precio": 2500,
+    "nombre": "Café mediano + 2 med",
+    "precio": 2400,
     "tipo": "combo"
   },
   {
-    "id": "lagrima-chico-2med",
+    "id": "cafe-chico-3med",
     "categoria": "desayuno_merienda",
-    "nombre": "Lagrima chico + 2 med",
-    "precio": 2100,
+    "nombre": "Café chico + 3 med",
+    "precio": 3190,
     "tipo": "combo"
   },
   {
-    "id": "lagrima-mediano-2med",
+    "id": "cafe-mediano-3med",
     "categoria": "desayuno_merienda",
-    "nombre": "Lagrima mediano + 2 med",
-    "precio": 2500,
-    "tipo": "combo"
-  },
-  {
-    "id": "cortado-chico-2med",
-    "categoria": "desayuno_merienda",
-    "nombre": "Cortado chico + 2 med",
-    "precio": 2100,
-    "tipo": "combo"
-  },
-  {
-    "id": "cortado-mediano-2med",
-    "categoria": "desayuno_merienda",
-    "nombre": "Cortado mediano + 2 med",
-    "precio": 2500,
-    "tipo": "combo"
-  },
-  {
-    "id": "capuchino-chico-2med",
-    "categoria": "desayuno_merienda",
-    "nombre": "Capuchino chico + 2 med",
-    "precio": 2300,
-    "tipo": "combo"
-  },
-  {
-    "id": "capuchino-mediano-2med",
-    "categoria": "desayuno_merienda",
-    "nombre": "Capuchino mediano + 2 med",
-    "precio": 2700,
-    "tipo": "combo"
-  },
-  {
-    "id": "chocolate-chico-2med",
-    "categoria": "desayuno_merienda",
-    "nombre": "Chocolate chico + 2 med",
-    "precio": 2300,
-    "tipo": "combo"
-  },
-  {
-    "id": "chocolate-mediano-2med",
-    "categoria": "desayuno_merienda",
-    "nombre": "Chocolate mediano + 2 med",
-    "precio": 2700,
-    "tipo": "combo"
-  },
-  {
-    "id": "te-2med",
-    "categoria": "desayuno_merienda",
-    "nombre": "Te + 2 med",
-    "precio": 2100,
+    "nombre": "Café mediano + 3 med",
+    "precio": 3490,
     "tipo": "combo"
   },
   {
     "id": "cafe-chico-tos",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe chico + tos",
-    "precio": 2400,
+    "precio": 4200,
     "tipo": "combo"
   },
   {
     "id": "cafe-mediano-tos",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe mediano + tos",
-    "precio": 2800,
+    "precio": 4500,
     "tipo": "combo"
   },
   {
-    "id": "lagrima-chico-tos",
+    "id": "shop-8",
     "categoria": "desayuno_merienda",
-    "nombre": "Lagrima chico + tos",
-    "precio": 2400,
+    "nombre": "Cafe chico + tos SHOP",
+    "precio": 3360,
     "tipo": "combo"
   },
   {
-    "id": "lagrima-mediano-tos",
+    "id": "shop-12",
     "categoria": "desayuno_merienda",
-    "nombre": "Lagrima mediano + tos",
-    "precio": 2800,
+    "nombre": "Cafe mediano + tos SHOP",
+    "precio": 3600,
     "tipo": "combo"
   },
   {
-    "id": "cortado-chico-tos",
+    "id": "latte",
     "categoria": "desayuno_merienda",
-    "nombre": "Cortado chico + tos",
-    "precio": 2400,
-    "tipo": "combo"
-  },
-  {
-    "id": "cortado-mediano-tos",
-    "categoria": "desayuno_merienda",
-    "nombre": "Cortado mediano + tos",
-    "precio": 2800,
-    "tipo": "combo"
-  },
-  {
-    "id": "capuchino-chico-tos",
-    "categoria": "desayuno_merienda",
-    "nombre": "Capuchino chico + tos",
-    "precio": 2600,
-    "tipo": "combo"
-  },
-  {
-    "id": "capuchino-mediano-tos",
-    "categoria": "desayuno_merienda",
-    "nombre": "Capuchino mediano + tos",
-    "precio": 3000,
-    "tipo": "combo"
-  },
-  {
-    "id": "vainilla-latte-chico",
-    "categoria": "desayuno_merienda",
-    "nombre": "Vainilla latte chico",
-    "precio": 2800,
+    "nombre": "Latte Saborizado",
+    "precio": 2900,
     "tipo": "bebida"
   },
   {
-    "id": "vainilla-latte-mediano",
+    "id": "iced-latte",
     "categoria": "desayuno_merienda",
-    "nombre": "Vainilla latte mediano",
-    "precio": 3200,
+    "nombre": "Iced Saborizado",
+    "precio": 2900,
     "tipo": "bebida"
   },
   {
-    "id": "avellana-latte-chico",
+    "id": "cafe-8",
     "categoria": "desayuno_merienda",
-    "nombre": "Avellana latte chico",
-    "precio": 2800,
-    "tipo": "bebida"
-  },
-  {
-    "id": "avellana-latte-mediano",
-    "categoria": "desayuno_merienda",
-    "nombre": "Avellana latte mediano",
-    "precio": 3200,
-    "tipo": "bebida"
-  },
-  {
-    "id": "iced-latte-vainilla",
-    "categoria": "desayuno_merienda",
-    "nombre": "Iced latte vainilla",
-    "precio": 3500,
-    "tipo": "bebida"
-  },
-  {
-    "id": "iced-latte-avellana",
-    "categoria": "desayuno_merienda",
-    "nombre": "Iced latte avellana",
-    "precio": 3500,
-    "tipo": "bebida"
-  },
-  {
-    "id": "sundae-ddl",
-    "categoria": "postres",
-    "nombre": "Sundae DDL",
+    "nombre": "Cafe 8oz",
     "precio": 2200,
+    "tipo": "bebida"
+  },
+  {
+    "id": "cafe-12",
+    "categoria": "desayuno_merienda",
+    "nombre": "Cafe 12oz",
+    "precio": 2400,
+    "tipo": "bebida"
+  },
+  {
+    "id": "jugo",
+    "categoria": "desayuno_merienda",
+    "nombre": "Jugo",
+    "precio": 1700,
+    "tipo": "bebida"
+  },
+  {
+    "id": "factura",
+    "categoria": "desayuno_merienda",
+    "nombre": "Factura",
+    "precio": 1000,
+    "tipo": "combo"
+  },
+  {
+    "id": "tostado",
+    "categoria": "desayuno_merienda",
+    "nombre": "Tostado",
+    "precio": 4000,
+    "tipo": "bebida"
+  },
+  {
+    "id": "add-saborizado",
+    "categoria": "desayuno_merienda",
+    "nombre": "Cambiar a saborizado",
+    "precio": 500,
+    "tipo": "bebida"
+  },
+  {
+    "id": "cono",
+    "categoria": "postres",
+    "nombre": "Cono",
+    "precio": 1000,
     "tipo": "postre"
   },
   {
-    "id": "sundae-chocolate",
+    "id": "cono-2x1",
     "categoria": "postres",
-    "nombre": "Sundae Chocolate",
-    "precio": 2200,
+    "nombre": "Cono 2x1",
+    "precio": 1400,
     "tipo": "postre"
   },
   {
-    "id": "cono-vainilla",
+    "id": "sundae",
     "categoria": "postres",
-    "nombre": "Cono vainilla",
-    "precio": 1500,
+    "nombre": "Sundae",
+    "precio": 2800,
     "tipo": "postre"
   },
   {
-    "id": "cono-chocolate",
+    "id": "sundae-off",
     "categoria": "postres",
-    "nombre": "Cono chocolate",
-    "precio": 1500,
+    "nombre": "Sundae 30%",
+    "precio": 1960,
     "tipo": "postre"
   },
   {
-    "id": "cono-mixto",
+    "id": "sundae-full",
     "categoria": "postres",
-    "nombre": "Cono mixto",
-    "precio": 1500,
+    "nombre": "Sundae Full",
+    "precio": 3300,
+    "tipo": "postre"
+  },
+  {
+    "id": "salsa",
+    "categoria": "postres",
+    "nombre": "Extra Salsa",
+    "precio": 750,
     "tipo": "postre"
   }
 ]
