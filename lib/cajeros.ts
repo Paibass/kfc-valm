@@ -1,9 +1,9 @@
 export const CAJEROS = [
-    { label: "Franco", user: "d.amato.franco" },
+    { label: "Sabri", user: "" },
     { label: "Vanina", user: "retuerto.vainina" },
     { label: "Paiva", user: "paiva.joaquin" },
-    { label: "Mia Q", user: "quiroz.mia" },
-    { label: "Mia M", user: "machado.mia" },
+    { label: "Mia", user: "quiroz.mia" },
+    { label: "Machado", user: "machado.mia" },
     { label: "Santi", user: "crinigan.santiago" },
     { label: "Kiara", user: "isasi.kiara" },
     { label: "Lara", user: "mazza.lara" },

@@ -1,0 +1,156 @@
+[
+  {
+    "id": "cafe-chico-2med",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café chico + 2 med",
+    "precio": 2100,
+    "tipo": "combo"
+  },
+  {
+    "id": "cafe-mediano-2med",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café mediano + 2 med",
+    "precio": 2400,
+    "tipo": "combo"
+  },
+  {
+    "id": "cafe-chico-3med",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café chico + 3 med",
+    "precio": 3190,
+    "tipo": "combo"
+  },
+  {
+    "id": "cafe-mediano-3med",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café mediano + 3 med",
+    "precio": 3490,
+    "tipo": "combo"
+  },
+  {
+    "id": "cafe-chico-tos",
+    "categoria": "desayuno_merienda",
+    "nombre": "Cafe chico + tos",
+    "precio": 4200,
+    "tipo": "combo"
+  },
+  {
+    "id": "cafe-mediano-tos",
+    "categoria": "desayuno_merienda",
+    "nombre": "Cafe mediano + tos",
+    "precio": 4500,
+    "tipo": "combo"
+  },
+  {
+    "id": "shop-8",
+    "categoria": "desayuno_merienda",
+    "nombre": "Cafe chico + tos SHOP",
+    "precio": 3360,
+    "tipo": "combo"
+  },
+  {
+    "id": "shop-12",
+    "categoria": "desayuno_merienda",
+    "nombre": "Cafe mediano + tos SHOP",
+    "precio": 3600,
+    "tipo": "combo"
+  },
+  {
+    "id": "latte",
+    "categoria": "desayuno_merienda",
+    "nombre": "Latte Saborizado",
+    "precio": 2900,
+    "tipo": "bebida"
+  },
+  {
+    "id": "iced-latte",
+    "categoria": "desayuno_merienda",
+    "nombre": "Iced Saborizado",
+    "precio": 2900,
+    "tipo": "bebida"
+  },
+  {
+    "id": "cafe-8",
+    "categoria": "desayuno_merienda",
+    "nombre": "Cafe 8oz",
+    "precio": 2200,
+    "tipo": "bebida"
+  },
+  {
+    "id": "cafe-12",
+    "categoria": "desayuno_merienda",
+    "nombre": "Cafe 12oz",
+    "precio": 2400,
+    "tipo": "bebida"
+  },
+  {
+    "id": "jugo",
+    "categoria": "desayuno_merienda",
+    "nombre": "Jugo",
+    "precio": 1700,
+    "tipo": "bebida"
+  },
+  {
+    "id": "factura",
+    "categoria": "desayuno_merienda",
+    "nombre": "Factura",
+    "precio": 1000,
+    "tipo": "combo"
+  },
+  {
+    "id": "tostado",
+    "categoria": "desayuno_merienda",
+    "nombre": "Tostado",
+    "precio": 4000,
+    "tipo": "bebida"
+  },
+  {
+    "id": "add-saborizado",
+    "categoria": "desayuno_merienda",
+    "nombre": "Cambiar a saborizado",
+    "precio": 500,
+    "tipo": "bebida"
+  },
+  {
+    "id": "cono",
+    "categoria": "postres",
+    "nombre": "Cono",
+    "precio": 1000,
+    "tipo": "postre"
+  },
+  {
+    "id": "cono-2x1",
+    "categoria": "postres",
+    "nombre": "Cono 2x1",
+    "precio": 1400,
+    "tipo": "postre"
+  },
+  {
+    "id": "sundae",
+    "categoria": "postres",
+    "nombre": "Sundae",
+    "precio": 2800,
+    "tipo": "postre"
+  },
+  {
+    "id": "sundae-off",
+    "categoria": "postres",
+    "nombre": "Sundae 30%",
+    "precio": 1960,
+    "tipo": "postre"
+  },
+  {
+    "id": "sundae-full",
+    "categoria": "postres",
+    "nombre": "Sundae Full",
+    "precio": 3300,
+    "tipo": "postre"
+  },
+  {
+    "id": "salsa",
+    "categoria": "postres",
+    "nombre": "Extra Salsa",
+    "precio": 750,
+    "tipo": "postre"
+  }
+]
