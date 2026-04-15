@@ -167,3 +167,46 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .divider{
     height:1px;background:var(--border);margin:14px 0;
 }
+
+/* Session card styles */
+.sessionCard{
+    background:linear-gradient(135deg, rgba(228, 0, 43, .04), rgba(228, 0, 43, .08));
+    border:1px solid rgba(228, 0, 43, .15);
+    border-radius:var(--r);
+    padding:14px;
+}
+
+.sessionHeader{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+}
+
+.sessionBadge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:4px 10px;
+    border-radius:20px;
+    background:linear-gradient(180deg,var(--kfc-red),var(--kfc-red-dark));
+    color:#fff;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.3px;
+    text-transform:uppercase;
+}
+
+.sessionBadge::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#fff;
+    animation:pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse{
+    0%,100%{opacity:1}
+    50%{opacity:.4}
+}

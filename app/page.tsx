@@ -1,44 +1,153 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { preprocessToBlob } from "@/lib/imagePreprocess";
 import { runOcrOnBlob } from "@/lib/ocr";
 import { parseTicketFromOcr, TicketData } from "@/lib/parseTicket";
 import { submitToGoogleForm } from "@/lib/submitToGoogleForm";
 import { CAJEROS } from "@/lib/cajeros";
 
+// localStorage helpers
+const STORAGE_KEYS = {
+  cajero: "kfc-session-cajero",
+  fecha: "kfc-session-fecha",
+};
+
+function getStoredValue(key: string, fallback: string = ""): string {
+  if (typeof window === "undefined") return fallback;
+  try {
+    return localStorage.getItem(key) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function setStoredValue(key: string, value: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // ignore
+  }
+}
+
+function getTodayFormatted(): string {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export default function Page() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
+  
+  // Session state (persisted)
+  const [sessionCajero, setSessionCajero] = useState<string>("");
+  const [sessionFecha, setSessionFecha] = useState<string>("");
+  const [sessionLoaded, setSessionLoaded] = useState(false);
+  
+  // Ticket state (reset per ticket)
   const [ticket, setTicket] = useState<TicketData>({
     fecha: "",
     chk4: "",
     cajero: "",
     detalle: "",
-    total: "", raw: "",
+    total: "",
+    raw: "",
   });
   const [toast, setToast] = useState<string>("");
   const [ocrRaw, setOcrRaw] = useState<string>("");
   const [showConsole, setShowConsole] = useState<boolean>(false);
-  const cajeroLabel = ticket?.cajero
-    ? (CAJEROS.find(c => c.user === ticket.cajero)?.label ?? "")
-    : "";
+
+  // Load session from localStorage on mount
+  useEffect(() => {
+    const storedCajero = getStoredValue(STORAGE_KEYS.cajero, "");
+    const storedFecha = getStoredValue(STORAGE_KEYS.fecha, "");
+    
+    // Use stored fecha or default to today
+    const fecha = storedFecha || getTodayFormatted();
+    
+    setSessionCajero(storedCajero);
+    setSessionFecha(fecha);
+    setTicket(prev => ({
+      ...prev,
+      cajero: storedCajero,
+      fecha: fecha,
+    }));
+    setSessionLoaded(true);
+  }, []);
+
+  // Auto-update date when day changes
+  useEffect(() => {
+    if (!sessionLoaded) return;
+    
+    const checkDateChange = () => {
+      const today = getTodayFormatted();
+      const storedFecha = getStoredValue(STORAGE_KEYS.fecha, "");
+      
+      // If stored date is different from today, update to today
+      if (storedFecha && storedFecha !== today) {
+        setSessionFecha(today);
+        setStoredValue(STORAGE_KEYS.fecha, today);
+        setTicket(prev => ({ ...prev, fecha: today }));
+      }
+    };
+    
+    // Check every minute
+    const interval = setInterval(checkDateChange, 60000);
+    return () => clearInterval(interval);
+  }, [sessionLoaded]);
+
+  // Update session handlers
+  const updateSessionCajero = useCallback((value: string) => {
+    setSessionCajero(value);
+    setStoredValue(STORAGE_KEYS.cajero, value);
+    setTicket(prev => ({ ...prev, cajero: value }));
+  }, []);
+
+  const updateSessionFecha = useCallback((value: string) => {
+    setSessionFecha(value);
+    setStoredValue(STORAGE_KEYS.fecha, value);
+    setTicket(prev => ({ ...prev, fecha: value }));
+  }, []);
 
 
   const canSave = useMemo(() => {
     return !!ticket.fecha && !!ticket.chk4 && !!ticket.cajero && !!ticket.detalle && !!ticket.total;
   }, [ticket]);
 
+  // Reset only ticket-specific fields, keep session (cajero/fecha)
+  function resetForNewTicket() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(null);
+    setPreviewUrl("");
+    setTicket({
+      fecha: sessionFecha,
+      chk4: "",
+      cajero: sessionCajero,
+      detalle: "",
+      total: "",
+      raw: "",
+    });
+    setToast("");
+    setProgress(null);
+    setOcrRaw("");
+    setShowConsole(false);
+  }
+  
+  // Full reset including session
   function resetAll() {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setFile(null);
     setPreviewUrl("");
     setTicket({
-      fecha: "",
+      fecha: sessionFecha,
       chk4: "",
-      cajero: "",
+      cajero: sessionCajero,
       detalle: "",
       total: "",
       raw: "",
@@ -71,7 +180,12 @@ export default function Page() {
       setOcrRaw(text);
 
       const parsed = parseTicketFromOcr(text);
-      setTicket(parsed);
+      // Preserve session fields (fecha, cajero), only use OCR for ticket-specific data
+      setTicket({
+        ...parsed,
+        fecha: sessionFecha,
+        cajero: sessionCajero,
+      });
       setToast("Listo. Revisá y guardá.");
     } catch (e: any) {
       setToast(`Error escaneando: ${e?.message ?? String(e)}`);
@@ -172,36 +286,62 @@ export default function Page() {
 
         <div className="divider" />
 
-        <div className="row">
-          <div className="col">
-            <label>Fecha</label>
-            <div style={{ display: "flex", gap: 8 }}>
+        {/* Session fields - persistent */}
+        <div className="sessionCard">
+          <div className="sessionHeader">
+            <span className="sessionBadge">Sesion activa</span>
+          </div>
+          <div className="row">
+            <div className="col">
+              <label>Fecha</label>
               <input
+                type="date"
                 value={ticket.fecha}
-                onChange={(e) => setTicket({ ...ticket, fecha: e.target.value })}
-                placeholder="dd/mm/aaaa"
+                onChange={(e) => updateSessionFecha(e.target.value)}
                 disabled={busy}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 14,
+                  border: "1px solid rgba(0,0,0,.10)",
+                  background: "#fff",
+                  fontSize: 14,
+                }}
               />
-              <button
-                type="button"
-                className="secondary"
-                style={{ flex: "0 0 auto", minWidth: 90 }}
+            </div>
+
+            <div className="col">
+              <label>Cajero</label>
+              <select
+                value={ticket.cajero}
+                onChange={(e) => updateSessionCajero(e.target.value)}
                 disabled={busy}
-                onClick={() => {
-                  const d = new Date();
-                  const dd = String(d.getDate()).padStart(2, "0");
-                  const mm = String(d.getMonth() + 1).padStart(2, "0");
-                  const yyyy = d.getFullYear();
-                  setTicket({ ...ticket, fecha: `${dd}/${mm}/${yyyy}` });
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  borderRadius: 14,
+                  border: "1px solid rgba(0,0,0,.10)",
+                  background: "#fff",
+                  fontSize: 14,
                 }}
               >
-                Hoy
-              </button>
+                <option value="">Seleccionar...</option>
+                {CAJEROS.map(c => (
+                  <option key={c.label} value={c.label}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
+        </div>
 
+        <div className="divider" />
+
+        {/* Ticket fields - reset per ticket */}
+        <div className="row">
           <div className="col">
-            <label>CHK (últimos 4)</label>
+            <label>CHK (ultimos 4)</label>
             <input
               inputMode="numeric"
               pattern="[0-9]*"
@@ -210,33 +350,6 @@ export default function Page() {
               placeholder="0000"
               disabled={busy}
             />
-
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col">
-            <label>Cajero</label>
-            <select
-              value={ticket.cajero}
-              onChange={(e) => setTicket({ ...ticket, cajero: e.target.value })}
-              disabled={busy}
-              style={{
-                width: "100%",
-                padding: 12,
-                borderRadius: 14,
-                border: "1px solid rgba(0,0,0,.10)",
-                background: "#fff",
-                fontSize: 14,
-              }}
-            >
-              <option value="">Seleccionar…</option>
-              {CAJEROS.map(c => (
-                <option key={c.label} value={c.label}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div className="col">
@@ -251,7 +364,6 @@ export default function Page() {
               placeholder="0,00"
               disabled={busy}
             />
-
           </div>
         </div>
 
@@ -269,8 +381,8 @@ export default function Page() {
           <button className="primary" onClick={onSave} disabled={!canSave || busy}>
             Guardar
           </button>
-          <button className="secondary" onClick={resetAll} disabled={busy}>
-            Otro ticket
+          <button className="secondary" onClick={resetForNewTicket} disabled={busy}>
+            Nuevo ticket
           </button>
         </div>
 
