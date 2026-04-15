@@ -104,23 +104,7 @@ export default function Page() {
     setSessionLoaded(true);
   }, []);
 
-  // Auto-update date when day changes
-  useEffect(() => {
-    if (!sessionLoaded) return;
 
-    const checkDateChange = () => {
-      const today = getTodayFormatted();
-      const storedFecha = getStoredValue(STORAGE_KEYS.fecha, "");
-
-      if (storedFecha && storedFecha !== today) {
-        setSessionFecha(today);
-        setStoredValue(STORAGE_KEYS.fecha, today);
-      }
-    };
-
-    const interval = setInterval(checkDateChange, 60000);
-    return () => clearInterval(interval);
-  }, [sessionLoaded]);
 
   // Session handlers
   const updateSessionCajero = useCallback((value: string) => {

@@ -4,15 +4,19 @@ const FORM_ACTION = process.env.NEXT_PUBLIC_GOOGLE_FORM_ACTION!;
 
 /**
  * Converts ISO date (yyyy-mm-dd) to Spanish format (dd/mm/yyyy)
+ * Returns clean string without any leading characters
  * @param isoDate - Date in format "2026-04-13"
  * @returns Date in format "13/04/2026"
  */
 function formatDateToSpanish(isoDate: string): string {
   if (!isoDate) return "";
-  const parts = isoDate.split("-");
-  if (parts.length !== 3) return isoDate; // Return as-is if not valid ISO
+  // Clean input: trim and remove any unexpected characters
+  const cleanInput = isoDate.trim();
+  const parts = cleanInput.split("-");
+  if (parts.length !== 3) return cleanInput;
   const [yyyy, mm, dd] = parts;
-  return `${dd}/${mm}/${yyyy}`;
+  // Return clean formatted date without any prefix
+  return [dd, mm, yyyy].join("/");
 }
 
 const ENTRY = {
