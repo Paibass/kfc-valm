@@ -1,7 +1,5 @@
 # 🍗 KFC Liniers – VALM Scanner
 
-## 🚀 Proyecto Portfolio
-
 Aplicación web mobile-first desarrollada para optimizar la carga de tickets de **Venta a la Mesa (VALM)**, reemplazando procesos manuales por una solución digital rápida, consistente y orientada a uso real en operación.
 
 ---
