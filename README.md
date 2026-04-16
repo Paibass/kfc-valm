@@ -1,112 +1,136 @@
-# KFC Liniers – VALM Ticket Scanner
+# 🍗 KFC Liniers – VALM Scanner
 
-Aplicación web para **digitalizar tickets de VALM (Venta a la Mesa)** mediante OCR y almacenar la información estructurada en una planilla de Google Sheets.
+## 🚀 Proyecto Portfolio
 
-La herramienta reemplaza el registro manual del libro de VALM, optimizando tiempos operativos y reduciendo errores de carga.
-
----
-
-## Descripción general
-
-La aplicación funciona íntegramente del lado del cliente y permite:
-
-- Capturar imágenes de tickets desde dispositivos móviles
-- Extraer datos relevantes mediante OCR
-- Validar y corregir la información detectada
-- Persistir los registros en un soporte centralizado
-
-No requiere backend propio ni servicios pagos.
+Aplicación web mobile-first desarrollada para optimizar la carga de tickets de **Venta a la Mesa (VALM)**, reemplazando procesos manuales por una solución digital rápida, consistente y orientada a uso real en operación.
 
 ---
 
-## Alcance funcional
+## 🧠 Problemática
 
-El sistema procesa tickets impresos y obtiene los siguientes datos:
+En el contexto operativo, los tickets de VALM se registraban manualmente en papel, lo que generaba:
 
-- Fecha del ticket  
-- Identificador de transacción (últimos 4 dígitos del CHK)  
-- Cajero/a (seleccionado desde un conjunto controlado de cajeros actuales)  
-- Detalle de la venta (normalizado)  
-- Total de la operación  
-
-Todos los campos son editables antes de confirmar el guardado.
+- Pérdida de tiempo
+- Errores humanos
+- Dificultad para analizar ventas
+- Falta de estructura en los datos
 
 ---
 
-## Estrategia de carga de datos
+## 💡 Solución
 
-- El texto detectado por OCR **no se considera confiable automáticamente**
-- La aplicación:
-  - autocompleta campos cuando es posible
-  - permite corrección manual en todos los casos
-- El cajero se selecciona desde un `<select>` para evitar inconsistencias
+Se desarrolló una webapp que permite:
 
-El envío se realiza mediante una solicitud `POST` a Google Forms (`no-cors`).
-
----
-
-## Estrategia de OCR
-
-- OCR ejecutado localmente con **Tesseract.js**
-- Preprocesamiento de imágenes:
-  - redimensionado
-  - escala de grises
-  - mejora de contraste
-- Detección basada en **patrones**, no en palabras clave fijas:
-  - formatos de fecha
-  - valores monetarios
-  - identificadores alfanuméricos
-
-Este enfoque mejora la tolerancia a errores de OCR y variaciones en el formato del ticket.
+- Cargar tickets de forma rápida desde el celular
+- Seleccionar productos mediante botones
+- Calcular automáticamente el total
+- Guardar los datos en una hoja de cálculo centralizada
 
 ---
 
-## Normalización de cajeros
+## 📱 Flujo de uso
 
-- Existe un conjunto predefinido de cajeros activos
-- El OCR intenta detectar coincidencias parciales sobre:
-  - nombre
-  - apellido
-  - combinaciones alfanuméricas
-- La selección final queda siempre bajo control del usuario
+1. Definir sesión:
+   - Fecha
+   - Cajero
 
-Esto garantiza consistencia en los datos almacenados.
+2. Por cada ticket:
+   - Ingresar CHK (últimos 4 dígitos)
+   - Seleccionar categoría
+   - Agregar productos con taps
+   - Verificar total
+   - Guardar
 
----
-
-## Interfaz de usuario
-
-- Diseño **mobile-first**
-- Flujo de uso reducido:
-  1. Captura de imagen
-  2. Escaneo
-  3. Validación
-  4. Guardado
-- Consola interna para visualizar el texto OCR
-- Pensado para uso operativo frecuente
+3. Continuar con el siguiente ticket sin reiniciar sesión
 
 ---
 
-## Deploy
+## 📊 Almacenamiento y análisis
 
-- Framework: **Next.js (App Router)**
-- Hosting: **Vercel**
-- Ejecución completamente del lado del cliente
-- Sin capa de backend propia
+Todos los datos se almacenan en **Google Sheets**, lo que permite:
 
----
-
-## Limitaciones
-
-- La precisión del OCR depende de:
-  1. calidad de la imagen
-  2. iluminacion
-  3. estado fisico del ticket
+- Visualizar ventas diarias
+- Analizar rendimiento por cajero
+- Obtener métricas por producto
+- Centralizar la información en tiempo real
 
 ---
 
-## Uso previsto
+## 🧾 Estructura de datos
 
-- Herramienta de uso interno para el registro de tickets VALM.
-- 
+Cada ticket incluye:
+
+- Fecha  
+- CHK  
+- Cajero  
+- Detalle normalizado  
+- Total  
+- Timestamp  
+
+---
+
+## 📦 Gestión de productos
+
+Los productos se gestionan mediante un archivo externo:
+
+```
+/products.json
+```
+
+Esto permite:
+
+- Modificar precios sin tocar código
+- Escalar el menú fácilmente
+- Mantener la UI desacoplada de la lógica
+
+---
+
+## 🏗 Arquitectura
+
+- Frontend: Next.js (App Router)
+- UI: React (client-side)
+- Deploy: Vercel
+- Backend liviano: Google Apps Script
+- Base de datos: Google Sheets
+
+---
+
+## 🎨 Diseño UX/UI
+
+- Mobile-first
+- Interfaz táctil optimizada
+- Botones grandes para carga rápida
+- Flujo sin fricción
+- Estética inspirada en KFC
+
+---
+
+## ⚙️ Decisiones técnicas clave
+
+- Uso de selección guiada para asegurar consistencia
+- Persistencia de sesión con localStorage
+- Uso de Sheets como base de datos ligera
+
+---
+
+## 📈 Impacto
+
+- Reducción significativa del tiempo de carga
+- Eliminación de errores manuales
+- Datos estructurados desde el origen
+- Mejora en el análisis de ventas
+
+---
+
+## 📍 Estado
+
+Aplicación funcional en producción para uso interno.
+
+---
+
+## 👨‍💻 Autor
+
+Proyecto desarrollado como solución real a una necesidad operativa, combinando desarrollo web, UX y automatización de procesos.
+
+
   
