@@ -147,6 +147,13 @@
     "tipo": "postre"
   },
   {
+    "id": "avalancha",
+    "categoria": "postres",
+    "nombre": "Avalancha",
+    "precio": 4000,
+    "tipo": "postre"
+  },
+  {
     "id": "salsa",
     "categoria": "postres",
     "nombre": "Extra Salsa",
