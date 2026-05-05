@@ -3,84 +3,84 @@
     "id": "cafe-chico-2med",
     "categoria": "desayuno_merienda",
     "nombre": "Café chico + 2 med",
-    "precio": 2100,
+    "precio": 2200,
     "tipo": "combo"
   },
   {
     "id": "cafe-mediano-2med",
     "categoria": "desayuno_merienda",
     "nombre": "Café mediano + 2 med",
-    "precio": 2400,
+    "precio": 2500,
     "tipo": "combo"
   },
   {
     "id": "cafe-chico-3med",
     "categoria": "desayuno_merienda",
     "nombre": "Café chico + 3 med",
-    "precio": 3190,
+    "precio": 3300,
     "tipo": "combo"
   },
   {
     "id": "cafe-mediano-3med",
     "categoria": "desayuno_merienda",
     "nombre": "Café mediano + 3 med",
-    "precio": 3490,
+    "precio": 3600,
     "tipo": "combo"
   },
   {
     "id": "cafe-chico-tos",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe chico + tos",
-    "precio": 4200,
+    "precio": 4400,
     "tipo": "combo"
   },
   {
     "id": "cafe-mediano-tos",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe mediano + tos",
-    "precio": 4500,
+    "precio": 4700,
     "tipo": "combo"
   },
   {
     "id": "shop-8",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe chico + tos SHOP",
-    "precio": 3360,
+    "precio": 3520,
     "tipo": "combo"
   },
   {
     "id": "shop-12",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe mediano + tos SHOP",
-    "precio": 3600,
+    "precio": 3760,
     "tipo": "combo"
   },
   {
     "id": "latte",
     "categoria": "desayuno_merienda",
     "nombre": "Latte Saborizado",
-    "precio": 2900,
+    "precio": 3300,
     "tipo": "bebida"
   },
   {
     "id": "iced-latte",
     "categoria": "desayuno_merienda",
     "nombre": "Iced Saborizado",
-    "precio": 2900,
+    "precio": 3300,
     "tipo": "bebida"
   },
   {
     "id": "cafe-8",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe 8oz",
-    "precio": 2200,
+    "precio": 2300,
     "tipo": "bebida"
   },
   {
     "id": "cafe-12",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe 12oz",
-    "precio": 2400,
+    "precio": 2500,
     "tipo": "bebida"
   },
   {
@@ -129,28 +129,28 @@
     "id": "sundae",
     "categoria": "postres",
     "nombre": "Sundae",
-    "precio": 2800,
+    "precio": 3000,
     "tipo": "postre"
   },
   {
     "id": "sundae-off",
     "categoria": "postres",
     "nombre": "Sundae 30%",
-    "precio": 1960,
+    "precio": 2100,
     "tipo": "postre"
   },
   {
     "id": "sundae-full",
     "categoria": "postres",
     "nombre": "Sundae Full",
-    "precio": 3300,
+    "precio": 3400,
     "tipo": "postre"
   },
   {
     "id": "avalancha",
     "categoria": "postres",
     "nombre": "Avalancha",
-    "precio": 4000,
+    "precio": 4100,
     "tipo": "postre"
   },
   {
@@ -160,4 +160,12 @@
     "precio": 750,
     "tipo": "postre"
   }
+    {
+    "id": "krunch",
+    "categoria": "postres",
+    "nombre": "Cono Krunch",
+    "precio": 1600,
+    "tipo": "postre"
+  }
+  
 ]
