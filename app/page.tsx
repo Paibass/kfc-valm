@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { submitToGoogleForm } from "@/lib/submitToGoogleForm";
 import { CAJEROS } from "@/lib/cajeros";
+import { fetchDailyStats, type DailyStats } from "@/lib/fetchDailyStats";
 
 // Types
 interface Product {
@@ -79,6 +80,10 @@ export default function Page() {
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string>("");
 
+  // Daily stats state
+  const [dailyStats, setDailyStats] = useState<DailyStats | null>(null);
+  const [loadingDailyStats, setLoadingDailyStats] = useState(false);
+
   // Load products from JSON
   useEffect(() => {
     fetch("/products.json")
@@ -103,6 +108,28 @@ export default function Page() {
     setSessionFecha(fecha);
     setSessionLoaded(true);
   }, []);
+
+  // Load daily stats function
+  const loadDailyStats = useCallback(async (fecha: string) => {
+    if (!fecha) return;
+    setLoadingDailyStats(true);
+    try {
+      const stats = await fetchDailyStats(fecha);
+      setDailyStats(stats);
+    } catch (error) {
+      console.error("Error fetching daily stats:", error);
+      setDailyStats(null);
+    } finally {
+      setLoadingDailyStats(false);
+    }
+  }, []);
+
+  // Fetch daily stats when session fecha changes
+  useEffect(() => {
+    if (sessionLoaded && sessionFecha) {
+      loadDailyStats(sessionFecha);
+    }
+  }, [sessionLoaded, sessionFecha, loadDailyStats]);
 
 
 
@@ -194,6 +221,8 @@ export default function Page() {
         raw: "",
       });
       setToast("Guardado");
+      // Refresh daily stats after successful save
+      loadDailyStats(sessionFecha);
       // Auto reset for next ticket
       setTimeout(() => {
         resetForNewTicket();
@@ -221,6 +250,26 @@ export default function Page() {
             <img src="/icon.png" alt="Logo" className="logoImg" />
           </div>
           <strong className="brandTitle">KFC LINIERS VALM</strong>
+        </div>
+
+        {/* Daily Stats Indicator */}
+        <div className="dailyStatsChip">
+          {loadingDailyStats ? (
+            <span className="statsLoading">...</span>
+          ) : dailyStats && dailyStats.objetivo !== null ? (
+            <>
+              <span className="statsCount">
+                {dailyStats.ventas ?? 0} / {dailyStats.objetivo}
+              </span>
+              {dailyStats.dif !== null && (
+                <span className={`statsDif ${dailyStats.dif >= 0 ? "positive" : "negative"}`}>
+                  {dailyStats.dif >= 0 ? "+" : ""}{dailyStats.dif}
+                </span>
+              )}
+            </>
+          ) : (
+            <span className="statsNoData">Sin objetivo</span>
+          )}
         </div>
 
         <a
