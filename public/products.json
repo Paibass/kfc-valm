@@ -10,21 +10,21 @@
     "id": "cafe-mediano-2med",
     "categoria": "desayuno_merienda",
     "nombre": "Café mediano + 2 med",
-    "precio": 2500,
+    "precio": 2400,
     "tipo": "combo"
   },
   {
     "id": "cafe-chico-3med",
     "categoria": "desayuno_merienda",
     "nombre": "Café chico + 3 med",
-    "precio": 3300,
+    "precio": 3290,
     "tipo": "combo"
   },
   {
     "id": "cafe-mediano-3med",
     "categoria": "desayuno_merienda",
     "nombre": "Café mediano + 3 med",
-    "precio": 3600,
+    "precio": 3490,
     "tipo": "combo"
   },
   {
@@ -101,14 +101,14 @@
     "id": "tostado",
     "categoria": "desayuno_merienda",
     "nombre": "Tostado",
-    "precio": 4000,
+    "precio": 4100,
     "tipo": "bebida"
   },
   {
     "id": "add-saborizado",
     "categoria": "desayuno_merienda",
     "nombre": "Cambiar a saborizado",
-    "precio": 500,
+    "precio": 800,
     "tipo": "bebida"
   },
   {
