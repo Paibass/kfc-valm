@@ -3,70 +3,107 @@
     "id": "cafe-chico-2med",
     "categoria": "desayuno_merienda",
     "nombre": "Café chico + 2 med",
-    "precio": 2200,
+    "precio": 2500,
     "tipo": "combo"
   },
   {
     "id": "cafe-mediano-2med",
     "categoria": "desayuno_merienda",
     "nombre": "Café mediano + 2 med",
-    "precio": 2400,
+    "precio": 2900,
     "tipo": "combo"
   },
   {
     "id": "cafe-chico-3med",
     "categoria": "desayuno_merienda",
     "nombre": "Café chico + 3 med",
-    "precio": 3290,
+    "precio": 3660,
     "tipo": "combo"
   },
   {
     "id": "cafe-mediano-3med",
     "categoria": "desayuno_merienda",
     "nombre": "Café mediano + 3 med",
-    "precio": 3490,
+    "precio": 4000,
     "tipo": "combo"
   },
   {
     "id": "cafe-chico-tos",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe chico + tos",
-    "precio": 4400,
+    "precio": 4500,
     "tipo": "combo"
   },
   {
     "id": "cafe-mediano-tos",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe mediano + tos",
-    "precio": 4700,
+    "precio": 4800,
     "tipo": "combo"
   },
   {
     "id": "shop-8",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe chico + tos SHOP",
-    "precio": 3520,
+    "precio": 4000,
     "tipo": "combo"
   },
   {
     "id": "shop-12",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe mediano + tos SHOP",
-    "precio": 3760,
+    "precio": 4480,
     "tipo": "combo"
+  },
+    {
+    "id": "latte",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café chico + med LyC",
+    "precio": 3600,
+    "tipo": "bebida"
+  },  {
+    "id": "latte",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café mediano + med LyC",
+    "precio": 4100,
+    "tipo": "bebida"
+  },  {
+    "id": "latte",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café chico + 2 med LyC",
+    "precio": 5000,
+    "tipo": "bebida"
+  },  {
+    "id": "latte",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café mediano + 2 med Lyc",
+    "precio": 5400,
+    "tipo": "bebida"
+  },  {
+    "id": "latte",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café chico + chipa",
+    "precio": 3700,
+    "tipo": "bebida"
+  },  {
+    "id": "latte",
+    "categoria": "desayuno_merienda",
+    "nombre": "Café mediano + chipa",
+    "precio": 4200,
+    "tipo": "bebida"
   },
   {
     "id": "latte",
     "categoria": "desayuno_merienda",
     "nombre": "Latte Saborizado",
-    "precio": 3300,
+    "precio": 3400,
     "tipo": "bebida"
   },
   {
     "id": "iced-latte",
     "categoria": "desayuno_merienda",
     "nombre": "Iced Saborizado",
-    "precio": 3300,
+    "precio": 3400,
     "tipo": "bebida"
   },
   {
@@ -80,7 +117,7 @@
     "id": "cafe-12",
     "categoria": "desayuno_merienda",
     "nombre": "Cafe 12oz",
-    "precio": 2500,
+    "precio": 2600,
     "tipo": "bebida"
   },
   {
@@ -94,21 +131,21 @@
     "id": "factura",
     "categoria": "desayuno_merienda",
     "nombre": "Factura",
-    "precio": 1000,
+    "precio": 1100,
     "tipo": "combo"
   },
   {
     "id": "tostado",
     "categoria": "desayuno_merienda",
     "nombre": "Tostado",
-    "precio": 4100,
+    "precio": 4300,
     "tipo": "bebida"
   },
   {
     "id": "add-saborizado",
     "categoria": "desayuno_merienda",
     "nombre": "Cambiar a saborizado",
-    "precio": 800,
+    "precio": 1000,
     "tipo": "bebida"
   },
   {
