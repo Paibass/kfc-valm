@@ -60,40 +60,40 @@
     "categoria": "desayuno_merienda",
     "nombre": "Café chico + med LyC",
     "precio": 3600,
-    "tipo": "bebida"
+    "tipo": "combo"
   },  {
-    "id": "latte",
+    "id": "latte1",
     "categoria": "desayuno_merienda",
     "nombre": "Café mediano + med LyC",
     "precio": 4100,
-    "tipo": "bebida"
+    "tipo": "combo"
   },  {
-    "id": "latte",
+    "id": "latte2",
     "categoria": "desayuno_merienda",
     "nombre": "Café chico + 2 med LyC",
     "precio": 5000,
-    "tipo": "bebida"
+    "tipo": "combo"
   },  {
-    "id": "latte",
+    "id": "latte3",
     "categoria": "desayuno_merienda",
     "nombre": "Café mediano + 2 med Lyc",
     "precio": 5400,
-    "tipo": "bebida"
+    "tipo": "combo"
   },  {
-    "id": "latte",
+    "id": "latte4",
     "categoria": "desayuno_merienda",
     "nombre": "Café chico + chipa",
     "precio": 3700,
-    "tipo": "bebida"
+    "tipo": "combo"
   },  {
-    "id": "latte",
+    "id": "latte5",
     "categoria": "desayuno_merienda",
     "nombre": "Café mediano + chipa",
     "precio": 4200,
-    "tipo": "bebida"
+    "tipo": "combo"
   },
   {
-    "id": "latte",
+    "id": "latte6",
     "categoria": "desayuno_merienda",
     "nombre": "Latte Saborizado",
     "precio": 3400,
