@@ -6,7 +6,7 @@ export const CAJEROS = [
     { label: "Cande", user: "" },
     { label: "Santi", user: "crinigan.santiago" },
     { label: "Kiara", user: "isasi.kiara" },
-    { label: "Lara", user: "mazza.lara" },
+    { label: "Emma", user: "mazza.lara" },
 ];
 
 function norm(s: string) {
