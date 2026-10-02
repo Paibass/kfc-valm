@@ -25,11 +25,21 @@ body{
 .topbar{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    gap:12px;
+    gap:10px;
     margin-bottom:16px;
     padding:0 4px;
 }
+
+.menuBtn{display:flex;flex-direction:column;justify-content:center;gap:4px;width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px;cursor:pointer;flex:0 0 auto}
+.menuBtn span{display:block;height:2px;width:18px;border-radius:2px;background:var(--ink)}
+.topbar .brand{flex:1;min-width:0}
+
+.drawerLayer{position:fixed;inset:0;z-index:20;background:rgba(20,12,10,.42);animation:fadeIn .18s ease}
+.sideMenu{width:min(82vw,320px);height:100%;background:#fffaf7;padding:18px 14px;box-shadow:10px 0 28px rgba(0,0,0,.18);animation:slideIn .22s ease}
+.sideMenuHeader{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 20px;font-size:18px}
+.drawerClose{width:38px;height:38px;border:0;border-radius:12px;background:rgba(0,0,0,.06);font-size:26px;line-height:1;cursor:pointer}
+.sideMenuNav{display:grid;gap:8px}.sideMenuLink{display:flex;align-items:center;gap:12px;min-height:54px;padding:12px 14px;border-radius:14px;color:var(--ink);text-decoration:none;font-weight:600;background:#fff;border:1px solid var(--border)}.sideMenuLink span{color:var(--kfc-red);width:20px;text-align:center}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 
 .brand{
     display:flex;
@@ -427,6 +437,8 @@ button:disabled{
     background:rgba(228,0,43,.1);
     color:var(--kfc-red);
 }
+
+.rankingPage{min-height:100vh}.rankingIntro{display:grid;gap:8px}.eyebrow{margin:0;color:var(--kfc-red);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}.rankingIntro h1{margin:0;font-size:28px;letter-spacing:-.5px}.monthLabel{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}.monthInput{width:100%;min-height:48px;padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff;font:inherit;color:var(--ink)}.rankingSummary{display:flex;justify-content:space-between;align-items:center;margin:4px 0 2px;font-size:16px;font-weight:700;text-transform:capitalize}.rankingSummary span{font-size:12px;font-weight:500;color:var(--muted);text-transform:none}.rankingList{list-style:none;margin:0;padding:0;display:grid;gap:7px}.rankingRow{display:flex;align-items:center;min-height:50px;padding:8px 12px;border:1px solid var(--border);border-radius:13px;background:#fff}.rankingPosition{width:32px;font-size:17px;font-weight:700;color:var(--muted)}.rankingName{flex:1;font-weight:600}.rankingTickets{font-size:14px;color:var(--kfc-red)}.referenteSection{display:grid;gap:9px;margin-top:8px;padding-top:16px;border-top:1px solid var(--border)}.referenteRow{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;border-radius:13px;background:rgba(228,0,43,.06);font-weight:600}.referenteRow strong{color:var(--kfc-red)}.rankingState{display:grid;gap:12px;padding:20px 8px;text-align:center;color:var(--muted)}.retryButton{width:100%}.rankingSkeleton{gap:7px}.rankingSkeleton li{height:50px;border-radius:13px;background:linear-gradient(90deg,rgba(0,0,0,.06),rgba(0,0,0,.12),rgba(0,0,0,.06));background-size:200% 100%;animation:shimmer 1.2s infinite}.rankingSkeleton li span{display:none}@keyframes shimmer{to{background-position:-200% 0}}
 
 /* Utility */
 .divider{
