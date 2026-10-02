@@ -73,24 +73,9 @@ body{
     height:70%;
     object-fit:cover;
     display:block;
-}
-
-.sheetBtn{
-    display:grid;
-    place-items:center;
-    width:40px;
-    height:40px;
-    border-radius:12px;
-    background:linear-gradient(180deg,var(--kfc-red),var(--kfc-red-dark));
-    color:#fff;
-    text-decoration:none;
-    box-shadow:0 6px 14px rgba(228,0,43,.25);
-    flex:0 0 auto;
-}
-
-.sheetBtn:active{transform:translateY(1px)}
-
-/* Daily Stats Indicator */
+  }
+  
+  /* Daily Stats Indicator */
 .dailyStatsChip{
     display:flex;
     align-items:center;
