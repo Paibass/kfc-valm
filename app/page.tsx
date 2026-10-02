@@ -4,6 +4,7 @@ import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { submitToGoogleForm } from "@/lib/submitToGoogleForm";
 import { CAJEROS } from "@/lib/cajeros";
 import { fetchDailyStats, type DailyStats } from "@/lib/fetchDailyStats";
+import { AppHeader } from "@/components/AppHeader";
 
 // Types
 interface Product {
@@ -242,62 +243,7 @@ export default function Page() {
 
   return (
     <div className="container">
-      {/* Header */}
-      <header className="topbar">
-        <div className="brand">
-          <div className="logoBox">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.png" alt="Logo" className="logoImg" />
-          </div>
-          <strong className="brandTitle">KFC LINIERS VALM</strong>
-        </div>
-
-        {/* Daily Stats Indicator */}
-        <div className="dailyStatsChip">
-          {loadingDailyStats ? (
-            <span className="statsLoading">...</span>
-          ) : dailyStats && dailyStats.objetivo !== null ? (
-            <>
-              <span className="statsCount">
-                {dailyStats.ventas ?? 0} / {dailyStats.objetivo}
-              </span>
-              {dailyStats.dif !== null && (
-                <span className={`statsDif ${dailyStats.dif >= 0 ? "positive" : "negative"}`}>
-                  {dailyStats.dif >= 0 ? "+" : ""}{dailyStats.dif}
-                </span>
-              )}
-            </>
-          ) : (
-            <span className="statsNoData">Sin objetivo</span>
-          )}
-        </div>
-
-        <a
-          className="sheetBtn"
-          href="https://docs.google.com/spreadsheets/d/1JoJCl0i5Q3WHTc5jzhQM9Om4BPS9Wa_dYTdqU1RhOUw/edit?usp=sharing"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Abrir Google Sheets"
-          title="Abrir Google Sheets"
-        >
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-            <path
-              d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1v5h5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M7 12h10M7 16h10M10 10v10M14 10v10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-            />
-          </svg>
-        </a>
-      </header>
+      <AppHeader dailyStats={dailyStats} loadingDailyStats={loadingDailyStats} />
 
       <main className="section">
         {/* Session Block */}
