@@ -34,11 +34,12 @@ export async function GET(request: Request) {
         bodyPreview: text.slice(0, 300),
       }, { status: 500 })
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const detail = error instanceof Error ? error.message : String(error)
     return NextResponse.json({
       ok: false,
       error: "Failed to fetch daily stats",
-      detail: error?.message ?? String(error),
+      detail,
     }, { status: 500 })
   }
 }
