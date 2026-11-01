@@ -152,56 +152,56 @@
     "id": "cono",
     "categoria": "postres",
     "nombre": "Cono",
-    "precio": 1000,
+    "precio": 1200,
     "tipo": "postre"
   },
   {
     "id": "cono-2x1",
     "categoria": "postres",
     "nombre": "Cono 2x1",
-    "precio": 1400,
+    "precio": 1600,
     "tipo": "postre"
   },
   {
     "id": "sundae",
     "categoria": "postres",
     "nombre": "Sundae",
-    "precio": 3000,
+    "precio": 2200,
     "tipo": "postre"
   },
   {
     "id": "sundae-off",
     "categoria": "postres",
     "nombre": "Sundae 30%",
-    "precio": 2100,
+    "precio": 2200,
     "tipo": "postre"
   },
   {
     "id": "sundae-full",
     "categoria": "postres",
     "nombre": "Sundae Full",
-    "precio": 3400,
+    "precio": 4000,
     "tipo": "postre"
   },
   {
     "id": "avalancha",
     "categoria": "postres",
     "nombre": "Avalancha",
-    "precio": 4100,
+    "precio": 4500,
     "tipo": "postre"
   },
   {
     "id": "salsa",
     "categoria": "postres",
     "nombre": "Extra Salsa",
-    "precio": 750,
+    "precio": 700,
     "tipo": "postre"
   },
     {
     "id": "krunch",
     "categoria": "postres",
     "nombre": "Cono Krunch",
-    "precio": 1600,
+    "precio": 1800,
     "tipo": "postre"
   }
   
