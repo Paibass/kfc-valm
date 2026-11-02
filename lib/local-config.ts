@@ -67,7 +67,7 @@ export async function getLocalConfig(): Promise<LocalConfig> {
     listaPreciosId: row.lista_precios_id,
     referente: row.referente_id ? { id: row.referente_id, nombre: row.referente_nombre ?? "" } : null,
     integraciones: {
-      googleFormAction: row.google_form_action ?? process.env.NEXT_PUBLIC_GOOGLE_FORM_ACTION ?? "",
+      googleFormAction: row.google_form_action ?? "",
       appsScriptUrl: row.apps_script_url ?? "",
       spreadsheetUrl: row.spreadsheet_url ?? "",
     },

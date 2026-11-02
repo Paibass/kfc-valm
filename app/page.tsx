@@ -213,8 +213,12 @@ export default function Page() {
 
   // Save ticket
   async function onSave() {
-    if (!canSave) return;
-    setBusy(true);
+  if (!canSave) return;
+  if (!localConfig?.integraciones.googleFormAction) {
+    setToast("Este local todavía no tiene configurada su integración de Google Forms.");
+    return;
+  }
+  setBusy(true);
     setToast("");
 
     try {
@@ -225,7 +229,7 @@ export default function Page() {
         detalle,
         total: total.toString(),
         raw: "",
-      });
+      }, localConfig.integraciones.googleFormAction);
       setToast("Guardado");
       // Refresh daily stats after successful save
       loadDailyStats(sessionFecha);

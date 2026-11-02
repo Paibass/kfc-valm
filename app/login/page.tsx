@@ -1,14 +1,24 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+type LocalOption = { codigo: string; nombre: string };
 
 export default function LoginPage() {
   const router = useRouter();
+  const [locals, setLocals] = useState<LocalOption[]>([]);
   const [codigo, setCodigo] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/public/locals")
+      .then((response) => response.json())
+      .then((data) => setLocals(Array.isArray(data.locals) ? data.locals : []))
+      .catch(() => setError("No se pudieron cargar los locales"));
+  }, []);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -29,11 +39,13 @@ export default function LoginPage() {
     <h1>Acceso al local</h1>
     <p>Ingresá para cargar tickets y consultar el ranking.</p>
     <label htmlFor="local">Local</label>
-    <input id="local" value={codigo} onChange={(event) => setCodigo(event.target.value)} placeholder="LINIERS" autoComplete="organization" required />
+    <select id="local" value={codigo} onChange={(event) => setCodigo(event.target.value)} autoComplete="organization" required>
+      <option value="">Seleccionar local</option>
+      {locals.map((local) => <option key={local.codigo} value={local.codigo}>{local.nombre}</option>)}
+    </select>
     <label htmlFor="password">Contraseña</label>
     <input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Contraseña" autoComplete="current-password" required />
     {error && <div className="loginError" role="alert">{error}</div>}
     <button className="primary loginSubmit" disabled={busy}>{busy ? "Ingresando..." : "Ingresar"}</button>
-    <small>Contraseña inicial: 1234</small>
   </form></main>;
 }

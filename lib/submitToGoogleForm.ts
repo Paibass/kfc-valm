@@ -1,6 +1,6 @@
 import type { TicketData } from "./parseTicket";
 
-const FORM_ACTION = process.env.NEXT_PUBLIC_GOOGLE_FORM_ACTION!;
+
 
 /**
  * Converts ISO date (yyyy-mm-dd) to Spanish format (dd/mm/yyyy)
@@ -27,8 +27,8 @@ const ENTRY = {
     total:   "entry.718068187",
 };
 
-export async function submitToGoogleForm(t: TicketData) {
-    if (!FORM_ACTION) throw new Error("Falta NEXT_PUBLIC_GOOGLE_FORM_ACTION en .env.local");
+export async function submitToGoogleForm(t: TicketData, formAction: string) {
+    if (!formAction) throw new Error("Este local todavía no tiene configurada su integración de Google Forms.");
 
     const data = new URLSearchParams();
     data.append(ENTRY.fecha, formatDateToSpanish(t.fecha || ""));
@@ -38,5 +38,5 @@ export async function submitToGoogleForm(t: TicketData) {
     data.append(ENTRY.total, t.total || "");
 
     // Forms no devuelve CORS => no-cors (se guarda igual)
-    await fetch(FORM_ACTION, { method: "POST", mode: "no-cors", body: data });
+    await fetch(formAction, { method: "POST", mode: "no-cors", body: data });
 }
