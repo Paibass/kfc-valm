@@ -11,6 +11,13 @@ export interface LocalConfig {
     googleFormAction: string;
     appsScriptUrl: string;
     spreadsheetUrl: string;
+    formFields: {
+      fecha: string;
+      chk4: string;
+      cajero: string;
+      detalle: string;
+      total: string;
+    };
   };
 }
 
@@ -48,6 +55,11 @@ export async function getLocalConfig(): Promise<LocalConfig> {
     google_form_action: string | null;
     apps_script_url: string | null;
     spreadsheet_url: string | null;
+    form_fecha_field: string | null;
+    form_chk4_field: string | null;
+    form_cajero_field: string | null;
+    form_detalle_field: string | null;
+    form_total_field: string | null;
   }>(
     `SELECT l.id, l.codigo, l.nombre, l.lista_precios_id,
             r.id AS referente_id, r.nombre AS referente_nombre,
@@ -70,6 +82,13 @@ export async function getLocalConfig(): Promise<LocalConfig> {
       googleFormAction: row.google_form_action ?? "",
       appsScriptUrl: row.apps_script_url ?? "",
       spreadsheetUrl: row.spreadsheet_url ?? "",
+      formFields: {
+        fecha: row.form_fecha_field ?? "",
+        chk4: row.form_chk4_field ?? "",
+        cajero: row.form_cajero_field ?? "",
+        detalle: row.form_detalle_field ?? "",
+        total: row.form_total_field ?? "",
+      },
     },
   };
 }

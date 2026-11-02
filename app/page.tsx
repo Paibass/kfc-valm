@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import { submitToGoogleForm } from "@/lib/submitToGoogleForm";
 import { fetchDailyStats, type DailyStats } from "@/lib/fetchDailyStats";
 import { fetchLocalCashiers, fetchLocalCatalog, fetchLocalConfig } from "@/lib/fetchLocalConfig";
 import type { LocalCashier, LocalConfig } from "@/lib/local-config";
@@ -214,22 +213,17 @@ export default function Page() {
   // Save ticket
   async function onSave() {
   if (!canSave) return;
-  if (!localConfig?.integraciones.googleFormAction) {
-    setToast("Este local todavía no tiene configurada su integración de Google Forms.");
-    return;
-  }
   setBusy(true);
     setToast("");
 
     try {
-      await submitToGoogleForm({
-        fecha: sessionFecha,
-        chk4,
-        cajero: sessionCajero,
-        detalle,
-        total: total.toString(),
-        raw: "",
-      }, localConfig.integraciones.googleFormAction);
+      const response = await fetch("/api/tickets", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ fecha: sessionFecha, chk4, cajero: sessionCajero, detalle, total: total.toString(), raw: "" }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo guardar el ticket");
       setToast("Guardado");
       // Refresh daily stats after successful save
       loadDailyStats(sessionFecha);
