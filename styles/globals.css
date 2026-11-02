@@ -437,3 +437,19 @@ button:disabled{
     background:var(--border);
     margin:14px 0;
 }
+
+.adminPage{padding-top:32px;padding-bottom:48px}
+.adminTop{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
+.adminTop h1{margin:4px 0 0;font-size:clamp(24px,4vw,36px)}
+.adminCard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
+.adminCard h2{margin:0 0 14px;font-size:18px}
+.adminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.adminGrid label{display:grid;gap:6px;font-size:12px;font-weight:700;color:var(--muted)}
+.adminRows{display:grid;gap:10px}
+.adminRow{display:grid;grid-template-columns:minmax(130px,1fr) minmax(110px,160px) auto auto;align-items:center;gap:8px}
+.adminRow input{min-width:0}
+.adminProductName{font-weight:700;font-size:13px}
+.checkLabel{display:flex;align-items:center;gap:5px;font-size:12px;white-space:nowrap}
+.checkLabel input{width:auto}
+.adminBack{white-space:nowrap}
+@media(max-width:680px){.adminGrid{grid-template-columns:1fr}.adminRow{grid-template-columns:1fr 1fr}.adminRow .adminProductName{grid-column:1/-1}.adminRow button{justify-self:start}}
