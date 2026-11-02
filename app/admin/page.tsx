@@ -37,7 +37,12 @@ export default function AdminPage() {
     setProducts(catalogData.products);
   }
 
-  useEffect(() => { load().catch((e) => setError(e instanceof Error ? e.message : "No se pudo cargar el panel")); }, []);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void load().catch((e) => setError(e instanceof Error ? e.message : "No se pudo cargar el panel"));
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   async function update(payload: unknown) {
     try { await save(payload); setMessage("Cambios guardados"); setTimeout(() => setMessage(""), 2200); await load(); }

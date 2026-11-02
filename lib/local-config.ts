@@ -7,6 +7,11 @@ export interface LocalConfig {
   nombre: string;
   listaPreciosId: number | null;
   referente: { id: number; nombre: string } | null;
+  integraciones: {
+    googleFormAction: string;
+    appsScriptUrl: string;
+    spreadsheetUrl: string;
+  };
 }
 
 export interface LocalCashier {
@@ -40,11 +45,16 @@ export async function getLocalConfig(): Promise<LocalConfig> {
     lista_precios_id: number | null;
     referente_id: number | null;
     referente_nombre: string | null;
+    google_form_action: string | null;
+    apps_script_url: string | null;
+    spreadsheet_url: string | null;
   }>(
     `SELECT l.id, l.codigo, l.nombre, l.lista_precios_id,
-            r.id AS referente_id, r.nombre AS referente_nombre
+            r.id AS referente_id, r.nombre AS referente_nombre,
+            i.google_form_action, i.apps_script_url, i.spreadsheet_url
        FROM locales l
        LEFT JOIN cajeros r ON r.local_id = l.id AND r.activo = TRUE AND r.es_referente = TRUE
+       LEFT JOIN integraciones_local i ON i.local_id = l.id
       WHERE l.id = $1 AND l.activo = TRUE`,
     [localId],
   );
@@ -56,6 +66,11 @@ export async function getLocalConfig(): Promise<LocalConfig> {
     nombre: row.nombre,
     listaPreciosId: row.lista_precios_id,
     referente: row.referente_id ? { id: row.referente_id, nombre: row.referente_nombre ?? "" } : null,
+    integraciones: {
+      googleFormAction: row.google_form_action ?? process.env.NEXT_PUBLIC_GOOGLE_FORM_ACTION ?? "",
+      appsScriptUrl: row.apps_script_url ?? "",
+      spreadsheetUrl: row.spreadsheet_url ?? "",
+    },
   };
 }
 

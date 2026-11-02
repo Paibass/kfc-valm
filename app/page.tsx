@@ -4,7 +4,7 @@ import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { submitToGoogleForm } from "@/lib/submitToGoogleForm";
 import { fetchDailyStats, type DailyStats } from "@/lib/fetchDailyStats";
 import { fetchLocalCashiers, fetchLocalCatalog, fetchLocalConfig } from "@/lib/fetchLocalConfig";
-import type { CatalogProduct, LocalCashier, LocalConfig } from "@/lib/local-config";
+import type { LocalCashier, LocalConfig } from "@/lib/local-config";
 import { AppHeader } from "@/components/AppHeader";
 
 // Types
@@ -101,7 +101,6 @@ export default function Page() {
         const cashierName = cashierData.cashiers.some((cashier) => cashier.nombre === storedCajero) ? storedCajero : "";
         setSessionCajero(cashierName);
         setSessionFecha(storedFecha);
-        setTicket((previous) => ({ ...previous, cajero: cashierName, fecha: storedFecha }));
       })
       .catch((error) => {
         if (cancelled) return;
