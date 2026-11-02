@@ -35,7 +35,7 @@ export default function RankingPage() {
   useEffect(() => {
     fetch("/api/local-config/cashiers", { cache: "no-store" })
       .then((response) => response.ok ? response.json() : Promise.reject(new Error("No se pudo cargar el referente")))
-      .then((result: { cashiers: Array<{ nombre: string; es_referente: boolean }> }) => setReferenteName(result.cashiers.find((cashier) => cashier.es_referente)?.nombre ?? ""))
+      .then((result: { cashiers: Array<{ nombre: string; esReferente: boolean }> }) => setReferenteName(result.cashiers.find((cashier) => cashier.esReferente)?.nombre ?? ""))
       .catch(() => setReferenteName(""));
   }, []);
 
