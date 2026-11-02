@@ -8,31 +8,88 @@ async function requireLocal() {
   return session.local_id;
 }
 
+function normalizedName(value: unknown) {
+  return typeof value === "string" ? value.trim().replace(/\s+/g, " ") : "";
+}
+
+async function hasDuplicate(pool: ReturnType<typeof getDbPool>, localId: number, name: string, exceptId?: number) {
+  const result = await pool.query<{ id: number }>(
+    `SELECT id FROM cajeros WHERE local_id = $1 AND activo = TRUE AND lower(nombre) = lower($2) ${exceptId ? "AND id <> $3" : ""} LIMIT 1`,
+    exceptId ? [localId, name, exceptId] : [localId, name],
+  );
+  return (result.rowCount ?? 0) > 0;
+}
+
+export async function GET() {
+  try {
+    const localId = await requireLocal();
+    const result = await getDbPool().query(
+      "SELECT id, nombre, es_referente FROM cajeros WHERE local_id = $1 AND activo = TRUE ORDER BY nombre",
+      [localId],
+    );
+    return NextResponse.json({ cashiers: result.rows });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "No se pudo cargar";
+    return NextResponse.json({ error: message === "UNAUTHORIZED" ? "Unauthorized" : message }, { status: message === "UNAUTHORIZED" ? 401 : 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const localId = await requireLocal();
+    const body = await request.json();
+    const nombre = normalizedName(body.nombre);
+    if (!nombre) return NextResponse.json({ error: "El nombre es obligatorio" }, { status: 400 });
+    const pool = getDbPool();
+    if (await hasDuplicate(pool, localId, nombre)) return NextResponse.json({ error: "Ya existe un cajero con ese nombre" }, { status: 409 });
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      if (body.esReferente === true) await client.query("UPDATE cajeros SET es_referente = FALSE WHERE local_id = $1 AND activo = TRUE", [localId]);
+      const result = await client.query("INSERT INTO cajeros (local_id, nombre, es_referente, activo) VALUES ($1, $2, $3, TRUE) RETURNING id, nombre, es_referente", [localId, nombre, body.esReferente === true]);
+      await client.query("COMMIT");
+      return NextResponse.json({ cashier: result.rows[0] }, { status: 201 });
+    } catch (error) { await client.query("ROLLBACK"); throw error; } finally { client.release(); }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "No se pudo crear el cajero";
+    return NextResponse.json({ error: message === "UNAUTHORIZED" ? "Unauthorized" : message }, { status: message === "UNAUTHORIZED" ? 401 : 400 });
+  }
+}
+
 export async function PATCH(request: Request) {
   try {
     const localId = await requireLocal();
     const body = await request.json();
+    const id = Number(body.id);
+    const nombre = normalizedName(body.nombre);
+    if (!Number.isInteger(id) || id <= 0 || !nombre) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     const pool = getDbPool();
-    if (body.type === "local") {
-      await pool.query("UPDATE locales SET nombre = COALESCE($1, nombre), lista_precios_id = $2 WHERE id = $3", [typeof body.nombre === "string" ? body.nombre.trim() : null, body.listaPreciosId || null, localId]);
-    } else if (body.type === "cashier") {
-      if (!Number.isInteger(body.id)) throw new Error("Invalid cashier");
-      await pool.query("UPDATE cajeros SET nombre = $1, usuario_pos = $2, es_referente = $3 WHERE id = $4 AND local_id = $5", [body.nombre, body.usuarioPos || null, Boolean(body.esReferente), body.id, localId]);
-    } else if (body.type === "price") {
-      const result = await pool.query<{ lista_precios_id: number | null }>("SELECT lista_precios_id FROM locales WHERE id = $1", [localId]);
-      const listId = result.rows[0]?.lista_precios_id;
-      if (!listId || !Number.isFinite(Number(body.precio)) || Number(body.precio) < 0) throw new Error("Precio inválido");
-      await pool.query("UPDATE precios_producto SET precio = $1 WHERE producto_id = (SELECT id FROM productos WHERE codigo = $2) AND lista_precios_id = $3 AND activo = TRUE", [Number(body.precio), body.codigo, listId]);
-    } else if (body.type === "integration") {
-      await pool.query(`INSERT INTO integraciones_local (local_id, google_form_action, apps_script_url, spreadsheet_url)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (local_id) DO UPDATE SET google_form_action = EXCLUDED.google_form_action, apps_script_url = EXCLUDED.apps_script_url, spreadsheet_url = EXCLUDED.spreadsheet_url`, [localId, body.googleFormAction || null, body.appsScriptUrl || null, body.spreadsheetUrl || null]);
-    } else {
-      throw new Error("Tipo de actualización inválido");
-    }
+    if (await hasDuplicate(pool, localId, nombre, id)) return NextResponse.json({ error: "Ya existe un cajero con ese nombre" }, { status: 409 });
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      if (body.esReferente === true) await client.query("UPDATE cajeros SET es_referente = FALSE WHERE local_id = $1 AND activo = TRUE AND id <> $2", [localId, id]);
+      const result = await client.query("UPDATE cajeros SET nombre = $1, es_referente = $2 WHERE id = $3 AND local_id = $4 AND activo = TRUE RETURNING id, nombre, es_referente", [nombre, body.esReferente === true, id, localId]);
+      if (result.rowCount === 0) { await client.query("ROLLBACK"); return NextResponse.json({ error: "Cajero no encontrado" }, { status: 404 }); }
+      await client.query("COMMIT");
+      return NextResponse.json({ cashier: result.rows[0] });
+    } catch (error) { await client.query("ROLLBACK"); throw error; } finally { client.release(); }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "No se pudo actualizar el cajero";
+    return NextResponse.json({ error: message === "UNAUTHORIZED" ? "Unauthorized" : message }, { status: message === "UNAUTHORIZED" ? 401 : 400 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const localId = await requireLocal();
+    const { id } = await request.json();
+    if (!Number.isInteger(Number(id))) return NextResponse.json({ error: "Cajero inválido" }, { status: 400 });
+    const result = await getDbPool().query("UPDATE cajeros SET activo = FALSE, es_referente = FALSE WHERE id = $1 AND local_id = $2 AND activo = TRUE RETURNING id", [Number(id), localId]);
+    if (result.rowCount === 0) return NextResponse.json({ error: "Cajero no encontrado" }, { status: 404 });
     return NextResponse.json({ ok: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "No se pudo guardar";
+    const message = error instanceof Error ? error.message : "No se pudo eliminar el cajero";
     return NextResponse.json({ error: message === "UNAUTHORIZED" ? "Unauthorized" : message }, { status: message === "UNAUTHORIZED" ? 401 : 400 });
   }
 }

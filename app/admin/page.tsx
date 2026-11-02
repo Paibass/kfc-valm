@@ -3,60 +3,70 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-type Product = { id: string; nombre: string; categoria: string; tipo: string; precio: number };
-type Cashier = { id: number; nombre: string; usuarioPos: string | null; esReferente: boolean };
+type Cashier = { id: number; nombre: string; es_referente: boolean };
 
-type Config = { id: number; codigo: string; nombre: string; listaPreciosId: number | null; referente: { id: number; nombre: string } | null };
-
-async function save(payload: unknown) {
-  const response = await fetch("/api/admin", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
+async function requestCashiers() {
+  const response = await fetch("/api/admin", { cache: "no-store" });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "No se pudo guardar");
+  if (!response.ok) throw new Error(data.error || "No se pudo cargar la lista");
+  return data.cashiers as Cashier[];
 }
 
 export default function AdminPage() {
-  const [config, setConfig] = useState<Config | null>(null);
   const [cashiers, setCashiers] = useState<Cashier[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [editing, setEditing] = useState<number | null>(null);
+  const [name, setName] = useState("");
+  const [referente, setReferente] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   async function load() {
-    setError("");
-    const [configResponse, cashierResponse, catalogResponse] = await Promise.all([
-      fetch("/api/local-config", { cache: "no-store" }),
-      fetch("/api/local-config/cashiers", { cache: "no-store" }),
-      fetch("/api/local-config/catalog", { cache: "no-store" }),
-    ]);
-    if (!configResponse.ok || !cashierResponse.ok || !catalogResponse.ok) throw new Error("Sesión requerida");
-    const configData = await configResponse.json();
-    const cashierData = await cashierResponse.json();
-    const catalogData = await catalogResponse.json();
-    setConfig(configData);
-    setCashiers(cashierData.cashiers);
-    setProducts(catalogData.products);
+    setLoading(true);
+    try { setCashiers(await requestCashiers()); setError(""); }
+    catch (e) { setError(e instanceof Error ? e.message : "No se pudo cargar la lista"); }
+    finally { setLoading(false); }
   }
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void load().catch((e) => setError(e instanceof Error ? e.message : "No se pudo cargar el panel"));
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, []);
+  useEffect(() => { void load(); }, []);
 
-  async function update(payload: unknown) {
-    try { await save(payload); setMessage("Cambios guardados"); setTimeout(() => setMessage(""), 2200); await load(); }
-    catch (e) { setError(e instanceof Error ? e.message : "No se pudo guardar"); }
+  function openCreate() { setEditing(null); setName(""); setReferente(false); setFormOpen(true); setError(""); }
+  function openEdit(cashier: Cashier) { setEditing(cashier.id); setName(cashier.nombre); setReferente(cashier.es_referente); setFormOpen(true); setError(""); }
+  function closeForm() { setFormOpen(false); setEditing(null); setName(""); setReferente(false); }
+
+  async function save() {
+    const trimmed = name.trim().replace(/\s+/g, " ");
+    if (!trimmed) { setError("El nombre es obligatorio"); return; }
+    if (editing && cashiers.find((cashier) => cashier.id === editing)?.nombre !== trimmed && !window.confirm("Cambiar el nombre puede dividir sus registros históricos en el ranking. ¿Continuar?")) return;
+    try {
+      const response = await fetch("/api/admin", { method: editing ? "PATCH" : "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: editing, nombre: trimmed, esReferente: referente }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "No se pudo guardar");
+      closeForm(); await load(); setMessage(editing ? "Cajero actualizado" : "Cajero agregado"); window.setTimeout(() => setMessage(""), 2200);
+    } catch (e) { setError(e instanceof Error ? e.message : "No se pudo guardar"); }
+  }
+
+  async function remove(cashier: Cashier) {
+    if (!window.confirm(`¿Eliminar a ${cashier.nombre}? Se conservará su historial.`)) return;
+    try {
+      const response = await fetch("/api/admin", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: cashier.id }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "No se pudo eliminar");
+      await load(); setMessage("Cajero eliminado"); window.setTimeout(() => setMessage(""), 2200);
+    } catch (e) { setError(e instanceof Error ? e.message : "No se pudo eliminar"); }
   }
 
   return (
     <main className="container adminPage">
-      <div className="adminTop"><div><p className="eyebrow">Administración</p><h1>Configuración del local</h1></div><Link href="/" className="secondary adminBack">Volver</Link></div>
-      {error && <div className="toast error">{error}</div>}
-      {message && <div className="toast success">{message}</div>}
-      {config && <section className="adminCard"><h2>Local activo</h2><div className="adminGrid"><label>Nombre<input value={config.nombre} onChange={(e) => setConfig({ ...config, nombre: e.target.value })} /></label><label>Código<input value={config.codigo} disabled /></label></div><button className="primary" onClick={() => update({ type: "local", nombre: config.nombre, listaPreciosId: config.listaPreciosId })}>Guardar local</button></section>}
-      <section className="adminCard"><h2>Cajeros</h2><div className="adminRows">{cashiers.map((cashier) => <div className="adminRow" key={cashier.id}><input value={cashier.nombre} onChange={(e) => setCashiers((items) => items.map((item) => item.id === cashier.id ? { ...item, nombre: e.target.value } : item))} /><input value={cashier.usuarioPos ?? ""} placeholder="Usuario POS" onChange={(e) => setCashiers((items) => items.map((item) => item.id === cashier.id ? { ...item, usuarioPos: e.target.value } : item))} /><label className="checkLabel"><input type="checkbox" checked={cashier.esReferente} onChange={(e) => setCashiers((items) => items.map((item) => item.id === cashier.id ? { ...item, esReferente: e.target.checked } : item))} /> Referente</label><button className="secondary" onClick={() => update({ type: "cashier", ...cashier })}>Guardar</button></div>)}</div></section>
-      <section className="adminCard"><h2>Precios</h2><div className="adminRows">{products.map((product) => <div className="adminRow" key={product.id}><span className="adminProductName">{product.nombre}</span><input type="number" min="0" step="0.01" value={product.precio} onChange={(e) => setProducts((items) => items.map((item) => item.id === product.id ? { ...item, precio: Number(e.target.value) } : item))} /><button className="secondary" onClick={() => update({ type: "price", codigo: product.id, precio: product.precio })}>Guardar</button></div>)}</div></section>
+      <div className="adminTop"><div><p className="eyebrow">Administración</p><h1>Gestión de cajeros</h1></div><Link href="/" className="secondary adminBack">Volver</Link></div>
+      {error && <div className="toast error" role="alert">{error}</div>}
+      {message && <div className="toast success" role="status">{message}</div>}
+      <section className="adminCard cashierAdminCard">
+        <div className="adminSectionHeader"><div><h2>Cajeros</h2><p className="adminHint">Solo se muestran los cajeros activos de este local.</p></div><button className="primary addCashierButton" onClick={openCreate}>+ Agregar cajero</button></div>
+        {formOpen && <div className="cashierForm"><label>Nombre<input autoFocus value={name} onChange={(e) => setName(e.target.value)} maxLength={80} /></label><label className="checkLabel"><input type="checkbox" checked={referente} onChange={(e) => setReferente(e.target.checked)} /> Es referente</label><div className="formActions"><button className="secondary" onClick={closeForm}>Cancelar</button><button className="primary" onClick={save}>Guardar</button></div></div>}
+        {loading ? <p className="adminHint">Cargando cajeros...</p> : cashiers.length === 0 ? <p className="adminHint">No hay cajeros activos.</p> : <div className="cashierRows">{cashiers.map((cashier) => <div className="cashierRow" key={cashier.id}><div className="cashierName">{cashier.nombre}{cashier.es_referente && <span className="referentBadge">Referente</span>}</div><div className="cashierActions"><button className="secondary" onClick={() => openEdit(cashier)}>Editar</button><button className="dangerButton" onClick={() => remove(cashier)}>Eliminar</button></div></div>)}</div>}
+      </section>
     </main>
   );
 }

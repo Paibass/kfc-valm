@@ -34,9 +34,7 @@ export function SideMenu({ open, onClose }: SideMenuProps) {
         <nav className="sideMenuNav">
           <Link href="/" onClick={onClose} className="sideMenuLink"><span aria-hidden="true">▣</span>Cargar tickets</Link>
           <Link href="/ranking" onClick={onClose} className="sideMenuLink"><span aria-hidden="true">★</span>Ranking mensual</Link>
-          <Link href="/admin" onClick={onClose} className="sideMenuLink"><span aria-hidden="true">⚙</span>Administración</Link>
-  <Link href="/admin" onClick={onClose} className="sideMenuLink"><span aria-hidden="true">⚙</span>Administración</Link>
-  <Link href="/change-password" onClick={onClose} className="sideMenuLink"><span aria-hidden="true">●</span>Cambiar contraseña</Link>
+          <Link href="/admin" onClick={onClose} className="sideMenuLink"><span aria-hidden="true">⚙</span>Gestionar cajeros</Link>
           <button type="button" className="sideMenuLink sideMenuAction" onClick={async () => { await fetch("/api/local-auth/logout", { method: "POST" }); window.location.href = "/login"; }}><span aria-hidden="true">↪</span>Cerrar sesión</button>
         </nav>
       </aside>

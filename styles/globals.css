@@ -441,6 +441,19 @@ button:disabled{
 .adminPage{padding-top:32px;padding-bottom:48px}
 .adminTop{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
 .adminTop h1{margin:4px 0 0;font-size:clamp(24px,4vw,36px)}
+.adminSectionHeader{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.adminHint{margin:4px 0 0;color:var(--muted);font-size:13px}
+.addCashierButton{white-space:nowrap}
+.cashierRows{display:flex;flex-direction:column;gap:8px}
+.cashierRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.cashierName{display:flex;align-items:center;gap:8px;font-weight:700;min-width:0}
+.cashierActions{display:flex;gap:8px;flex-shrink:0}
+.referentBadge{font-size:11px;color:var(--kfc-red);border:1px solid rgba(228,0,43,.25);border-radius:999px;padding:3px 7px;font-weight:700}
+.dangerButton{border:1px solid rgba(228,0,43,.24);background:#fff;color:var(--kfc-red);border-radius:12px;padding:10px 12px;cursor:pointer;font-weight:700}
+.cashierForm{display:grid;gap:12px;padding:14px;margin-bottom:14px;background:rgba(228,0,43,.04);border:1px solid rgba(228,0,43,.15);border-radius:14px}
+.cashierForm label{display:grid;gap:6px;font-size:13px;font-weight:700}
+.formActions{display:flex;justify-content:flex-end;gap:8px}
+
 .adminCard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
 .adminCard h2{margin:0 0 14px;font-size:18px}
 .adminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
