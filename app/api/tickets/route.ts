@@ -16,7 +16,8 @@ export async function POST(request: Request) {
   if (!body?.fecha || !body.cajero || !body.detalle || !body.total) return NextResponse.json({ ok: false, error: "Datos de ticket incompletos" }, { status: 400 });
   const { googleFormAction, formFields } = config.integraciones;
   const fields = Object.values(formFields);
-  if (!googleFormAction || fields.some((field) => !field)) return NextResponse.json({ ok: false, error: "Este local no tiene una integración de Google Forms completa" }, { status: 409 });
+  const validFieldId = (field: string) => /^entry\.\d+$/.test(field);
+  if (!googleFormAction || fields.length !== 5 || fields.some((field) => !validFieldId(field))) return NextResponse.json({ ok: false, error: "Este local no tiene una integración de Google Forms completa" }, { status: 409 });
   const data = new URLSearchParams();
   data.set(formFields.fecha, formatDate(body.fecha));
   data.set(formFields.chk4, body.chk4 ?? "");

@@ -55,15 +55,11 @@ export async function getLocalConfig(): Promise<LocalConfig> {
     google_form_action: string | null;
     apps_script_url: string | null;
     spreadsheet_url: string | null;
-    form_fecha_field: string | null;
-    form_chk4_field: string | null;
-    form_cajero_field: string | null;
-    form_detalle_field: string | null;
-    form_total_field: string | null;
+    google_form_fields: unknown;
   }>(
     `SELECT l.id, l.codigo, l.nombre, l.lista_precios_id,
             r.id AS referente_id, r.nombre AS referente_nombre,
-            i.google_form_action, i.apps_script_url, i.spreadsheet_url
+            i.google_form_action, i.apps_script_url, i.spreadsheet_url, i.google_form_fields
        FROM locales l
        LEFT JOIN cajeros r ON r.local_id = l.id AND r.activo = TRUE AND r.es_referente = TRUE
        LEFT JOIN integraciones_local i ON i.local_id = l.id
@@ -72,6 +68,14 @@ export async function getLocalConfig(): Promise<LocalConfig> {
   );
   const row = result.rows[0];
   if (!row) throw new Error("LOCAL_NOT_FOUND");
+  const rawFields = row.google_form_fields && typeof row.google_form_fields === "object" ? row.google_form_fields as Record<string, unknown> : {};
+  const formFields = {
+    fecha: typeof rawFields.fecha === "string" ? rawFields.fecha : "",
+    chk4: typeof rawFields.chk4 === "string" ? rawFields.chk4 : "",
+    cajero: typeof rawFields.cajero === "string" ? rawFields.cajero : "",
+    detalle: typeof rawFields.detalle === "string" ? rawFields.detalle : "",
+    total: typeof rawFields.total === "string" ? rawFields.total : "",
+  };
   return {
     id: row.id,
     codigo: row.codigo,
@@ -82,13 +86,7 @@ export async function getLocalConfig(): Promise<LocalConfig> {
       googleFormAction: row.google_form_action ?? "",
       appsScriptUrl: row.apps_script_url ?? "",
       spreadsheetUrl: row.spreadsheet_url ?? "",
-      formFields: {
-        fecha: row.form_fecha_field ?? "",
-        chk4: row.form_chk4_field ?? "",
-        cajero: row.form_cajero_field ?? "",
-        detalle: row.form_detalle_field ?? "",
-        total: row.form_total_field ?? "",
-      },
+      formFields,
     },
   };
 }
