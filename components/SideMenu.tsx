@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useLocalIdentity } from "./LocalIdentity";
 
 interface SideMenuProps {
   open: boolean;
@@ -10,6 +11,7 @@ interface SideMenuProps {
 
 export function SideMenu({ open, onClose }: SideMenuProps) {
   const [spreadsheetUrl, setSpreadsheetUrl] = useState("");
+  const { title } = useLocalIdentity();
 
   useEffect(() => {
     if (open) fetch("/api/local-config", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).then((data) => setSpreadsheetUrl(data?.integraciones?.spreadsheetUrl ?? "")).catch(() => setSpreadsheetUrl(""));
@@ -34,7 +36,7 @@ export function SideMenu({ open, onClose }: SideMenuProps) {
     <div className="drawerLayer" role="presentation" onMouseDown={onClose}>
       <aside className="sideMenu" role="dialog" aria-modal="true" aria-label="Navegación" onMouseDown={(event) => event.stopPropagation()}>
         <div className="sideMenuHeader">
-          <strong>Menú</strong>
+          <strong>{title}</strong>
           <button type="button" className="drawerClose" onClick={onClose} aria-label="Cerrar menú">×</button>
         </div>
         <nav className="sideMenuNav">

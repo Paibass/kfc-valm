@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { AppHeader } from "@/components/AppHeader";
 
 type Cashier = { id: number; nombre: string; es_referente: boolean };
 
@@ -59,6 +60,7 @@ export default function AdminPage() {
 
   return (
     <main className="container adminPage">
+      <AppHeader />
       <div className="adminTop"><div><p className="eyebrow">Administración</p><h1>Gestión de cajeros</h1></div><Link href="/" className="secondary adminBack">Volver</Link></div>
       {error && <div className="toast error" role="alert">{error}</div>}
       {message && <div className="toast success" role="status">{message}</div>}
