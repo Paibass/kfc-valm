@@ -42,9 +42,7 @@ export async function loginLocal(codigo: string, password: string) {
   const local = localResult.rows[0];
   if (!local) return false;
   const credential = await query<{ password_hash: string }>("SELECT password_hash FROM credenciales_local WHERE local_id = $1", [local.id]);
-  const valid = credential.rows[0] ? verifyPassword(password, credential.rows[0].password_hash) : password === "1234";
-  if (!valid) return false;
-  if (!credential.rows[0]) await query("INSERT INTO credenciales_local (local_id, password_hash) VALUES ($1, $2)", [local.id, hashPassword("1234")]);
+  if (!credential.rows[0] || !verifyPassword(password, credential.rows[0].password_hash)) return false;
   await createLocalSession(local.id);
   return local;
 }
@@ -58,7 +56,7 @@ export async function logoutLocal() {
 
 export async function changeLocalPassword(currentPassword: string, newPassword: string) {
   const session = await getLocalSession();
-  if (!session || newPassword.length < 4) return false;
+  if (!session || newPassword.length < 8) return false;
   const result = await query<{ password_hash: string }>("SELECT password_hash FROM credenciales_local WHERE local_id = $1", [session.local_id]);
   if (!result.rows[0] || !verifyPassword(currentPassword, result.rows[0].password_hash)) return false;
   await query("UPDATE credenciales_local SET password_hash = $1, updated_at = now() WHERE local_id = $2", [hashPassword(newPassword), session.local_id]);
