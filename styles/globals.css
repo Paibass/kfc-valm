@@ -41,8 +41,16 @@ body{
 .sideMenuNav{display:grid;gap:8px}.sideMenuAction{width:100%;border:0;text-align:left;cursor:pointer;font:inherit}
 
 .loginPage{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--bg)}
-.loginCard{width:min(100%,390px);display:grid;gap:10px;padding:28px;border:1px solid var(--border);border-radius:24px;background:var(--card);box-shadow:0 18px 50px rgba(0,0,0,.15)}
-.loginCard h1{margin:0 0 2px}.loginCard p{color:var(--muted);margin:0 0 12px}.loginCard small{color:var(--muted);text-align:center}.loginLogo{font-weight:900;color:var(--kfc-red);font-size:30px}.loginSubmit{margin-top:8px}.loginError{color:var(--kfc-red);font-size:13px}.loginSuccess{color:#16a34a;font-size:13px}
+ .loginShell{width:min(100%,430px);display:flex;flex-direction:column;align-items:center;gap:18px}
+ .loginCard{width:100%;display:grid;gap:10px;padding:30px 24px 24px;border:1px solid rgba(228,0,43,.12);border-radius:22px;background:var(--card);box-shadow:0 20px 60px rgba(27,20,18,.12)}
+ .loginBrand{display:flex;flex-direction:column;align-items:center;gap:8px}.loginLogo{font-weight:950;letter-spacing:-.06em;color:var(--kfc-red);font-size:36px;line-height:1}.loginBrandLine{width:34px;height:4px;border-radius:999px;background:var(--kfc-red)}
+ .loginCard h1{text-align:center;margin:0;font-size:28px;letter-spacing:-.03em}.loginCard label{margin-top:6px;font-size:13px;font-weight:750;color:var(--ink)}
+ .loginWelcome{text-align:center;color:var(--ink);font-size:15px;line-height:1.4;margin:0}.loginHint{text-align:center;color:var(--muted);font-size:13px;line-height:1.4;margin:-4px 0 10px}
+ .loginCard select,.loginCard input{width:100%;min-height:48px;padding:0 14px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+ .loginCard select:focus,.loginCard input:focus{border-color:var(--kfc-red);box-shadow:0 0 0 4px rgba(228,0,43,.12)}
+ .loginSubmit{margin-top:10px;min-height:50px;border-radius:12px;font-size:15px;font-weight:800;transition:transform .15s,filter .15s}.loginSubmit:hover:not(:disabled){filter:brightness(.95);transform:translateY(-1px)}.loginSubmit:active:not(:disabled){transform:translateY(0)}.loginSubmit:disabled{opacity:.7;cursor:wait}
+ .loginError{color:var(--kfc-red);font-size:13px;line-height:1.4;padding:10px 12px;border-radius:10px;background:rgba(228,0,43,.07)}.loginSignature{font-family:Georgia,serif;font-style:italic;font-size:12px;color:color-mix(in srgb,var(--muted) 48%,transparent)}
+ .loginSuccess{color:#16a34a;font-size:13px}
 
 .sideMenuLink{display:flex;align-items:center;gap:12px;min-height:54px;padding:12px 14px;border-radius:14px;color:var(--ink);text-decoration:none;font-weight:600;background:#fff;border:1px solid var(--border)}.sideMenuLink span{color:var(--kfc-red);width:20px;text-align:center}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}

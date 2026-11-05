@@ -30,6 +30,7 @@ export default function RankingPage() {
     try { setData(await fetchMonthlyRanking(mes)); } catch { setData(null); setError(true); } finally { setLoading(false); }
   }, [mes]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {

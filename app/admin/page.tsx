@@ -30,6 +30,7 @@ export default function AdminPage() {
     finally { setLoading(false); }
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { void load(); }, []);
 
   function openCreate() { setEditing(null); setName(""); setReferente(false); setFormOpen(true); setError(""); }

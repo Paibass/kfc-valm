@@ -68,7 +68,7 @@ export default function Page() {
   // Session state (persisted)
   const [sessionCajero, setSessionCajero] = useState<string>("");
   const [sessionFecha, setSessionFecha] = useState<string>("");
-  const [sessionLoaded, setSessionLoaded] = useState(false);
+  const sessionLoaded = Boolean(localConfig);
 
   // Ticket state (reset per ticket)
   const [chk4, setChk4] = useState<string>("");
@@ -109,11 +109,6 @@ export default function Page() {
     return () => { cancelled = true; };
   }, []);
 
-  // The local configuration loader initializes the session after authentication.
-  useEffect(() => {
-    setSessionLoaded(Boolean(localConfig));
-  }, [localConfig]);
-
   // Load daily stats function
   const loadDailyStats = useCallback(async (fecha: string) => {
     if (!fecha) return;
@@ -131,9 +126,9 @@ export default function Page() {
 
   // Fetch daily stats when session fecha changes
   useEffect(() => {
-    if (sessionLoaded && sessionFecha) {
-      loadDailyStats(sessionFecha);
-    }
+    if (!sessionLoaded || !sessionFecha) return;
+    const timer = window.setTimeout(() => { void loadDailyStats(sessionFecha); }, 0);
+    return () => window.clearTimeout(timer);
   }, [sessionLoaded, sessionFecha, loadDailyStats]);
 
 
