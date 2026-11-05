@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SideMenu } from "./SideMenu";
+import { useLocalIdentity } from "./LocalIdentity";
 
 interface AppHeaderProps {
   dailyStats?: { ventas: number | null; objetivo: number | null; dif: number | null } | null;
@@ -10,6 +11,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ dailyStats, loadingDailyStats = false }: AppHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { title } = useLocalIdentity();
 
   return (
     <>
@@ -22,7 +24,7 @@ export function AppHeader({ dailyStats, loadingDailyStats = false }: AppHeaderPr
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon.png" alt="Logo KFC" className="logoImg" />
           </div>
-          <strong className="brandTitle">KFC LINIERS VALM</strong>
+          <strong className="brandTitle">{title}</strong>
         </div>
         {dailyStats !== undefined && <div className="dailyStatsChip">{loadingDailyStats ? <span className="statsLoading">...</span> : dailyStats && dailyStats.objetivo !== null ? <><span className="statsCount">{dailyStats.ventas ?? 0} / {dailyStats.objetivo}</span>{dailyStats.dif !== null && <span className={`statsDif ${dailyStats.dif >= 0 ? "positive" : "negative"}`}>{dailyStats.dif >= 0 ? "+" : ""}{dailyStats.dif}</span>}</> : <span className="statsNoData">Sin objetivo</span>}</div>}
       </header>

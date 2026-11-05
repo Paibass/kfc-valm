@@ -38,7 +38,21 @@ body{
 .sideMenu{width:min(82vw,320px);height:100%;background:#fffaf7;padding:18px 14px;box-shadow:10px 0 28px rgba(0,0,0,.18);animation:slideIn .22s ease}
 .sideMenuHeader{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 20px;font-size:18px}
 .drawerClose{width:38px;height:38px;border:0;border-radius:12px;background:rgba(0,0,0,.06);font-size:26px;line-height:1;cursor:pointer}
-.sideMenuNav{display:grid;gap:8px}.sideMenuLink{display:flex;align-items:center;gap:12px;min-height:54px;padding:12px 14px;border-radius:14px;color:var(--ink);text-decoration:none;font-weight:600;background:#fff;border:1px solid var(--border)}.sideMenuLink span{color:var(--kfc-red);width:20px;text-align:center}
+.sideMenuNav{display:grid;gap:8px}.sideMenuAction{width:100%;border:0;text-align:left;cursor:pointer;font:inherit}
+
+.loginPage{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--bg)}
+ .loginShell{width:min(100%,430px);display:flex;flex-direction:column;align-items:center;gap:18px}
+ .loginCard{width:100%;display:grid;gap:10px;padding:30px 24px 24px;border:1px solid rgba(228,0,43,.12);border-radius:22px;background:var(--card);box-shadow:0 20px 60px rgba(27,20,18,.12)}
+ .loginBrand{display:flex;flex-direction:column;align-items:center;gap:8px}.loginLogo{font-weight:950;letter-spacing:-.06em;color:var(--kfc-red);font-size:36px;line-height:1}.loginBrandLine{width:34px;height:4px;border-radius:999px;background:var(--kfc-red)}
+ .loginCard h1{text-align:center;margin:0;font-size:28px;letter-spacing:-.03em}.loginCard label{margin-top:6px;font-size:13px;font-weight:750;color:var(--ink)}
+ .loginWelcome{text-align:center;color:var(--ink);font-size:15px;line-height:1.4;margin:0}.loginHint{text-align:center;color:var(--muted);font-size:13px;line-height:1.4;margin:-4px 0 10px}
+ .loginCard select,.loginCard input{width:100%;min-height:48px;padding:0 14px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+ .loginCard select:focus,.loginCard input:focus{border-color:var(--kfc-red);box-shadow:0 0 0 4px rgba(228,0,43,.12)}
+ .loginSubmit{margin-top:10px;min-height:50px;border-radius:12px;font-size:15px;font-weight:800;transition:transform .15s,filter .15s}.loginSubmit:hover:not(:disabled){filter:brightness(.95);transform:translateY(-1px)}.loginSubmit:active:not(:disabled){transform:translateY(0)}.loginSubmit:disabled{opacity:.7;cursor:wait}
+ .loginError{color:var(--kfc-red);font-size:13px;line-height:1.4;padding:10px 12px;border-radius:10px;background:rgba(228,0,43,.07)}.loginSignature{font-family:Georgia,serif;font-style:italic;font-size:12px;color:color-mix(in srgb,var(--muted) 48%,transparent)}
+ .loginSuccess{color:#16a34a;font-size:13px}
+
+.sideMenuLink{display:flex;align-items:center;gap:12px;min-height:54px;padding:12px 14px;border-radius:14px;color:var(--ink);text-decoration:none;font-weight:600;background:#fff;border:1px solid var(--border)}.sideMenuLink span{color:var(--kfc-red);width:20px;text-align:center}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 
 .brand{
@@ -431,3 +445,32 @@ button:disabled{
     background:var(--border);
     margin:14px 0;
 }
+
+.adminPage{padding-top:32px;padding-bottom:48px}
+.adminTop{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
+.adminTop h1{margin:4px 0 0;font-size:clamp(24px,4vw,36px)}
+.adminSectionHeader{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.adminHint{margin:4px 0 0;color:var(--muted);font-size:13px}
+.addCashierButton{white-space:nowrap}
+.cashierRows{display:flex;flex-direction:column;gap:8px}
+.cashierRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.cashierName{display:flex;align-items:center;gap:8px;font-weight:700;min-width:0}
+.cashierActions{display:flex;gap:8px;flex-shrink:0}
+.referentBadge{font-size:11px;color:var(--kfc-red);border:1px solid rgba(228,0,43,.25);border-radius:999px;padding:3px 7px;font-weight:700}
+.dangerButton{border:1px solid rgba(228,0,43,.24);background:#fff;color:var(--kfc-red);border-radius:12px;padding:10px 12px;cursor:pointer;font-weight:700}
+.cashierForm{display:grid;gap:12px;padding:14px;margin-bottom:14px;background:rgba(228,0,43,.04);border:1px solid rgba(228,0,43,.15);border-radius:14px}
+.cashierForm label{display:grid;gap:6px;font-size:13px;font-weight:700}
+.formActions{display:flex;justify-content:flex-end;gap:8px}
+
+.adminCard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
+.adminCard h2{margin:0 0 14px;font-size:18px}
+.adminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.adminGrid label{display:grid;gap:6px;font-size:12px;font-weight:700;color:var(--muted)}
+.adminRows{display:grid;gap:10px}
+.adminRow{display:grid;grid-template-columns:minmax(130px,1fr) minmax(110px,160px) auto auto;align-items:center;gap:8px}
+.adminRow input{min-width:0}
+.adminProductName{font-weight:700;font-size:13px}
+.checkLabel{display:flex;align-items:center;gap:5px;font-size:12px;white-space:nowrap}
+.checkLabel input{width:auto}
+.adminBack{white-space:nowrap}
+@media(max-width:680px){.adminGrid{grid-template-columns:1fr}.adminRow{grid-template-columns:1fr 1fr}.adminRow .adminProductName{grid-column:1/-1}.adminRow button{justify-self:start}}

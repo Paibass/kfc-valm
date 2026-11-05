@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import { submitToGoogleForm } from "@/lib/submitToGoogleForm";
-import { CAJEROS } from "@/lib/cajeros";
 import { fetchDailyStats, type DailyStats } from "@/lib/fetchDailyStats";
+import { fetchLocalCashiers, fetchLocalCatalog, fetchLocalConfig } from "@/lib/fetchLocalConfig";
+import type { LocalCashier, LocalConfig } from "@/lib/local-config";
 import { AppHeader } from "@/components/AppHeader";
 
 // Types
@@ -23,11 +23,6 @@ interface CartItem {
 }
 
 // localStorage helpers
-const STORAGE_KEYS = {
-  cajero: "kfc-session-cajero",
-  fecha: "kfc-session-fecha",
-};
-
 function getStoredValue(key: string, fallback: string = ""): string {
   if (typeof window === "undefined") return fallback;
   try {
@@ -63,14 +58,17 @@ function formatCurrency(value: number): string {
 }
 
 export default function Page() {
-  // Products from JSON
+  // Products, local configuration, and cashiers come from Neon
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
-
+  const [localConfig, setLocalConfig] = useState<LocalConfig | null>(null);
+  const [cashiers, setCashiers] = useState<LocalCashier[]>([]);
+  const [catalogError, setCatalogError] = useState("");
+  
   // Session state (persisted)
   const [sessionCajero, setSessionCajero] = useState<string>("");
   const [sessionFecha, setSessionFecha] = useState<string>("");
-  const [sessionLoaded, setSessionLoaded] = useState(false);
+  const sessionLoaded = Boolean(localConfig);
 
   // Ticket state (reset per ticket)
   const [chk4, setChk4] = useState<string>("");
@@ -85,29 +83,30 @@ export default function Page() {
   const [dailyStats, setDailyStats] = useState<DailyStats | null>(null);
   const [loadingDailyStats, setLoadingDailyStats] = useState(false);
 
-  // Load products from JSON
+  // Load the authenticated local, its cashiers, and its assigned price list.
   useEffect(() => {
-    fetch("/products.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data);
+    let cancelled = false;
+    Promise.all([fetchLocalConfig(), fetchLocalCashiers(), fetchLocalCatalog()])
+      .then(([config, cashierData, catalog]) => {
+        if (cancelled) return;
+        setLocalConfig(config);
+        setCashiers(cashierData.cashiers);
+        setProducts(catalog.products);
+        setCatalogError(catalog.configured ? "" : catalog.error || "La configuración de productos está incompleta.");
         setProductsLoading(false);
+        const key = `kfc-local-${config.id}`;
+        const storedCajero = getStoredValue(`${key}-cajero`, "");
+        const storedFecha = getStoredValue(`${key}-fecha`, "") || getTodayFormatted();
+        const cashierName = cashierData.cashiers.some((cashier) => cashier.nombre === storedCajero) ? storedCajero : "";
+        setSessionCajero(cashierName);
+        setSessionFecha(storedFecha);
       })
-      .catch((err) => {
-        console.error("Error loading products:", err);
+      .catch((error) => {
+        if (cancelled) return;
+        setCatalogError(error instanceof Error ? error.message : "No se pudo cargar la configuración del local.");
         setProductsLoading(false);
       });
-  }, []);
-
-  // Load session from localStorage on mount
-  useEffect(() => {
-    const storedCajero = getStoredValue(STORAGE_KEYS.cajero, "");
-    const storedFecha = getStoredValue(STORAGE_KEYS.fecha, "");
-    const fecha = storedFecha || getTodayFormatted();
-
-    setSessionCajero(storedCajero);
-    setSessionFecha(fecha);
-    setSessionLoaded(true);
+    return () => { cancelled = true; };
   }, []);
 
   // Load daily stats function
@@ -127,9 +126,9 @@ export default function Page() {
 
   // Fetch daily stats when session fecha changes
   useEffect(() => {
-    if (sessionLoaded && sessionFecha) {
-      loadDailyStats(sessionFecha);
-    }
+    if (!sessionLoaded || !sessionFecha) return;
+    const timer = window.setTimeout(() => { void loadDailyStats(sessionFecha); }, 0);
+    return () => window.clearTimeout(timer);
   }, [sessionLoaded, sessionFecha, loadDailyStats]);
 
 
@@ -137,13 +136,13 @@ export default function Page() {
   // Session handlers
   const updateSessionCajero = useCallback((value: string) => {
     setSessionCajero(value);
-    setStoredValue(STORAGE_KEYS.cajero, value);
-  }, []);
-
+    if (localConfig) setStoredValue(`kfc-local-${localConfig.id}-cajero`, value);
+  }, [localConfig]);
+  
   const updateSessionFecha = useCallback((value: string) => {
     setSessionFecha(value);
-    setStoredValue(STORAGE_KEYS.fecha, value);
-  }, []);
+    if (localConfig) setStoredValue(`kfc-local-${localConfig.id}-fecha`, value);
+  }, [localConfig]);
 
   // Calculated total
   const total = useMemo(() => {
@@ -208,19 +207,18 @@ export default function Page() {
 
   // Save ticket
   async function onSave() {
-    if (!canSave) return;
-    setBusy(true);
+  if (!canSave) return;
+  setBusy(true);
     setToast("");
 
     try {
-      await submitToGoogleForm({
-        fecha: sessionFecha,
-        chk4,
-        cajero: sessionCajero,
-        detalle,
-        total: total.toString(),
-        raw: "",
+      const response = await fetch("/api/tickets", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ fecha: sessionFecha, chk4, cajero: sessionCajero, detalle, total: total.toString(), raw: "" }),
       });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo guardar el ticket");
       setToast("Guardado");
       // Refresh daily stats after successful save
       loadDailyStats(sessionFecha);
@@ -267,11 +265,11 @@ export default function Page() {
                 disabled={busy}
               >
                 <option value="">Seleccionar...</option>
-                {CAJEROS.map((c) => (
-                  <option key={c.label} value={c.label}>
-                    {c.label}
-                  </option>
-                ))}
+              {cashiers.map((cashier) => (
+                <option key={cashier.id} value={cashier.nombre}>
+                  {cashier.nombre}
+                </option>
+              ))}
               </select>
             </div>
           </div>
@@ -308,11 +306,12 @@ export default function Page() {
           </button>
         </div>
 
-        {/* Products Grid */}
-        <div className="productsGrid">
-          {productsLoading ? (
-            <div className="loadingMessage">Cargando productos...</div>
-          ) : (
+  {/* Products Grid */}
+  {catalogError && <div className="toast error">{catalogError}</div>}
+  <div className="productsGrid">
+  {productsLoading ? (
+  <div className="loadingMessage">Cargando productos...</div>
+  ) : (
             filteredProducts.map((product) => (
               <button
                 key={product.id}

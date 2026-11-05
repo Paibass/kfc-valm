@@ -23,19 +23,28 @@ export default function RankingPage() {
   const [data, setData] = useState<MonthlyRanking | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [referenteName, setReferenteName] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true); setError(false);
     try { setData(await fetchMonthlyRanking(mes)); } catch { setData(null); setError(true); } finally { setLoading(false); }
   }, [mes]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); }, [load]);
 
-  const { paiva, competitors } = useMemo(() => {
+  useEffect(() => {
+    fetch("/api/local-config/cashiers", { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("No se pudo cargar el referente")))
+      .then((result: { cashiers: Array<{ nombre: string; esReferente: boolean }> }) => setReferenteName(result.cashiers.find((cashier) => cashier.esReferente)?.nombre ?? ""))
+      .catch(() => setReferenteName(""));
+  }, []);
+
+  const { referente, competitors } = useMemo(() => {
     const items = data?.ranking ?? [];
-    const referente = items.find((item) => item.cajero === "Paiva") ?? { puesto: 0, cajero: "Paiva", tickets: 0, porcentaje: 0 };
-    return { paiva: referente, competitors: items.filter((item) => item.cajero !== "Paiva").sort((a, b) => b.tickets - a.tickets) };
-  }, [data]);
+    const referenteItem = items.find((item) => item.cajero === referenteName) ?? { puesto: 0, cajero: referenteName || "Sin referente", tickets: 0, porcentaje: 0 };
+    return { referente: referenteItem, competitors: items.filter((item) => item.cajero !== referenteName).sort((a, b) => b.tickets - a.tickets) };
+  }, [data, referenteName]);
 
   return <div className="container rankingPage">
     <AppHeader />
@@ -52,7 +61,7 @@ export default function RankingPage() {
 
       <section className="referenteSection" aria-labelledby="referente-title">
         <p className="eyebrow" id="referente-title">Referente</p>
-        <div className="referenteRow"><span>{paiva.cajero}</span><strong>{paiva.tickets} TK</strong></div>
+        <div className="referenteRow"><span>{referente.cajero}</span><strong>{referente.tickets} TK</strong></div>
       </section>
     </main>
   </div>;
