@@ -149,13 +149,6 @@ export default function Page() {
     return items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
   }, [items]);
 
-  // Generate detalle string from items
-  const detalle = useMemo(() => {
-    return items
-      .map((item) => (item.cantidad > 1 ? `${item.cantidad}x ${item.nombre}` : item.nombre))
-      .join(" + ");
-  }, [items]);
-
   // Validation
   const canSave = useMemo(() => {
     return !!sessionFecha && !!sessionCajero && !!chk4 && items.length > 0;
@@ -215,7 +208,7 @@ export default function Page() {
       const response = await fetch("/api/tickets", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ fecha: sessionFecha, chk4, cajero: sessionCajero, detalle, total: total.toString(), raw: "" }),
+        body: JSON.stringify({ fecha: sessionFecha, chk4, cajero: sessionCajero, items: items.map(({ id, cantidad }) => ({ codigo: id, cantidad })) }),
       });
       const result = await response.json();
       if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo guardar el ticket");

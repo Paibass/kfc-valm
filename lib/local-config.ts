@@ -1,5 +1,6 @@
 import { getDbPool } from "@/lib/db";
 import { getLocalSession } from "@/lib/local-auth";
+import { resolveLocalProductPrices } from "@/lib/local-pricing";
 
 export interface LocalConfig {
   id: number;
@@ -110,24 +111,16 @@ export async function getLocalCashiers(): Promise<LocalCashier[]> {
 
 export async function getLocalCatalog(): Promise<{ products: CatalogProduct[]; configured: boolean; error?: string }> {
   const config = await getLocalConfig();
-  if (!config.listaPreciosId) return { products: [], configured: false, error: "El local no tiene una lista de precios asignada." };
-  const result = await getDbPool().query<{
-    codigo: string;
-    nombre: string;
-    categoria: string;
-    tipo: string;
-    precio: string;
-  }>(
-    `SELECT p.codigo, p.nombre, p.categoria, p.tipo, pp.precio::text AS precio
-       FROM productos p
-       JOIN precios_producto pp ON pp.producto_id = p.id
-        AND pp.lista_precios_id = $1 AND pp.activo = TRUE
-      WHERE p.activo = TRUE
-      ORDER BY p.id ASC`,
-    [config.listaPreciosId],
+  const rows = await resolveLocalProductPrices(config.id);
+  const products = rows.map((row) => ({ id: row.codigo, nombre: row.nombre, categoria: row.categoria, tipo: row.tipo, precio: Number(row.precio) }));
+  const missing = await getDbPool().query<{ count: string }>(
+    `SELECT count(*)::text AS count FROM productos p
+      LEFT JOIN locales l ON l.id = $1 AND l.activo = TRUE
+      LEFT JOIN precios_producto pp ON pp.producto_id = p.id AND pp.lista_precios_id = l.lista_precios_id AND pp.activo = TRUE
+      LEFT JOIN precios_excepciones pe ON pe.producto_id = p.id AND pe.local_id = l.id AND pe.activo = TRUE
+     WHERE p.activo = TRUE AND COALESCE(pe.precio, pp.precio) IS NULL`,
+    [config.id],
   );
-  const products = result.rows.map((row) => ({ id: row.codigo, nombre: row.nombre, categoria: row.categoria, tipo: row.tipo, precio: Number(row.precio) }));
-  const count = await getDbPool().query<{ count: string }>("SELECT count(*)::text AS count FROM productos WHERE activo = TRUE", []);
-  if (products.length !== Number(count.rows[0]?.count ?? 0)) return { products, configured: false, error: "La lista de precios no está completa para todos los productos activos." };
-  return { products, configured: true };
+  const configured = Number(missing.rows[0]?.count ?? 0) === 0;
+  return { products, configured, ...(configured ? {} : { error: "Algunos productos activos no tienen un precio válido y no están disponibles para la venta." }) };
 }
